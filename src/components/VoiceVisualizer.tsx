@@ -17,7 +17,7 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
 
     const analyzer = audioContext.createAnalyser();
     analyzerRef.current = analyzer;
-    analyzer.fftSize = 256; // Increased for smoother visualization
+    analyzer.fftSize = 512; // Increased for more detailed visualization
     
     const source = audioContext.createMediaStreamSource(mediaStream);
     source.connect(analyzer);
@@ -26,59 +26,59 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
     const ctx = canvas.getContext("2d")!;
     const bufferLength = analyzer.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    const timeDataArray = new Uint8Array(bufferLength);
 
     const draw = () => {
       if (!isRecording) return;
       
       animationFrameRef.current = requestAnimationFrame(draw);
       analyzer.getByteFrequencyData(dataArray);
-      analyzer.getByteTimeDomainData(timeDataArray);
 
-      // Clear canvas with semi-transparent black
-      ctx.fillStyle = "rgba(0, 0, 0, 0.9)";
+      // Clear canvas with pure black
+      ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw frequency bars
-      const barWidth = (canvas.width / bufferLength) * 2;
-      let x = 0;
+      // Draw the waveform visualization
+      const centerY = canvas.height / 2;
+      const lineWidth = 2;
+      const gap = 1;
+      const totalWidth = (lineWidth + gap) * bufferLength;
+      const startX = (canvas.width - totalWidth) / 2;
 
-      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-      for (let i = 0; i < bufferLength; i++) {
-        const barHeight = (dataArray[i] / 255) * (canvas.height / 2);
-        ctx.fillRect(x, canvas.height / 2 - barHeight / 2, barWidth - 1, barHeight);
-        x += barWidth;
-      }
-
-      // Draw waveform
-      ctx.beginPath();
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = lineWidth;
 
-      const sliceWidth = canvas.width / bufferLength;
-      x = 0;
-
-      ctx.moveTo(0, canvas.height * 0.75);
       for (let i = 0; i < bufferLength; i++) {
-        const v = timeDataArray[i] / 128.0;
-        const y = (v * canvas.height / 4) + (canvas.height * 0.75);
+        const x = startX + i * (lineWidth + gap);
+        const height = (dataArray[i] / 255) * (canvas.height / 2);
         
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-        x += sliceWidth;
+        // Draw vertical line
+        ctx.beginPath();
+        ctx.moveTo(x, centerY - height);
+        ctx.lineTo(x, centerY + height);
+        
+        // Create gradient effect
+        const gradient = ctx.createLinearGradient(x, centerY - height, x, centerY + height);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+        
+        ctx.strokeStyle = gradient;
+        ctx.stroke();
       }
 
-      ctx.lineTo(canvas.width, canvas.height * 0.75);
-      ctx.stroke();
-
-      // Add subtle glow effect
-      ctx.filter = 'blur(1px)';
+      // Add glow effect
+      ctx.filter = 'blur(2px)';
       ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-      ctx.stroke();
+      for (let i = 0; i < bufferLength; i++) {
+        const x = startX + i * (lineWidth + gap);
+        const height = (dataArray[i] / 255) * (canvas.height / 2);
+        
+        ctx.beginPath();
+        ctx.moveTo(x, centerY - height);
+        ctx.lineTo(x, centerY + height);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.stroke();
+      }
       ctx.filter = 'none';
       ctx.globalCompositeOperation = 'source-over';
     };
@@ -97,9 +97,9 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
   return (
     <canvas
       ref={canvasRef}
-      width={600}
+      width={800}
       height={200}
-      className="w-full h-48 rounded-lg bg-black/90 backdrop-blur-sm"
+      className="w-full h-48 rounded-lg bg-black"
     />
   );
 };
