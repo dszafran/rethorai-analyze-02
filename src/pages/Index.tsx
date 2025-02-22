@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
 import { PlayCircle, StopCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -72,14 +73,18 @@ const Index = () => {
           <div className="flex items-center gap-12">
             <div className="text-2xl font-bold text-white">RethorAI</div>
             <div className="hidden md:flex items-center gap-6">
-              <Button variant="ghost" className="text-white/70 hover:text-white">
-                <Home className="h-4 w-4 mr-2" />
-                Home
-              </Button>
-              <Button variant="ghost" className="text-white/70 hover:text-white">
-                <Mic className="h-4 w-4 mr-2" />
-                Speaking Coach
-              </Button>
+              <Link to="/">
+                <Button variant="ghost" className="text-white/70 hover:text-white">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </Button>
+              </Link>
+              <Link to="/speaking-coach">
+                <Button variant="ghost" className="text-white/70 hover:text-white">
+                  <Mic className="h-4 w-4 mr-2" />
+                  Speaking Coach
+                </Button>
+              </Link>
               <Button variant="ghost" className="text-white/70 hover:text-white">
                 <AudioWaveform className="h-4 w-4 mr-2" />
                 Analyze Speech
