@@ -228,37 +228,38 @@ const Index = () => {
             </div>
           )}
           {audioUrl && (
-            <div className="flex flex-col items-center gap-2 w-full max-w-lg">
+            <div className="flex flex-col items-center gap-4 w-full max-w-lg">
               <audio ref={audioPlayerRef} src={audioUrl} />
-              <div className="flex gap-2 w-full">
+              <div className="flex flex-col gap-2 w-full">
                 <Button
                   onClick={togglePlayback}
                   variant="outline"
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
+                  size="lg"
+                  className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6"
                 >
                   {isPlaying ? (
                     <>
-                      <StopCircle size={20} />
-                      Stop Playback
+                      <StopCircle className="w-6 h-6" />
+                      <span className="text-base">Stop Playback</span>
                     </>
                   ) : (
                     <>
-                      <PlayCircle size={20} />
-                      Play Recording
+                      <PlayCircle className="w-6 h-6" />
+                      <span className="text-base">Play Recording</span>
                     </>
                   )}
                 </Button>
                 <Button
                   onClick={deleteRecording}
-                  variant="outline"
-                  className="bg-white/5 hover:bg-white/10 text-white border-white/20"
+                  variant="ghost"
+                  className="text-white/70 hover:text-white hover:bg-white/5"
                 >
-                  <X size={20} />
+                  <X className="w-4 h-4 mr-2" />
+                  Delete Recording
                 </Button>
               </div>
             </div>
           )}
-        </div>
 
         {/* Dashboard Section */}
         <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
