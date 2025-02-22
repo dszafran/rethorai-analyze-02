@@ -15,7 +15,7 @@ const Index = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
@@ -238,12 +238,12 @@ const Index = () => {
           {audioUrl && (
             <div className="flex flex-col items-center gap-4 w-full max-w-lg mt-6">
               <audio ref={audioPlayerRef} src={audioUrl} />
-              <div className="flex flex-col gap-2 w-full">
+              <div className="flex gap-2 w-full">
                 <Button
                   onClick={togglePlayback}
                   variant="outline"
                   size="lg"
-                  className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6"
+                  className="flex-1 bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6"
                 >
                   {isPlaying ? (
                     <>
@@ -259,11 +259,11 @@ const Index = () => {
                 </Button>
                 <Button
                   onClick={deleteRecording}
-                  variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/5"
+                  variant="outline"
+                  size="lg"
+                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border-white/20 py-6"
                 >
-                  <X className="w-4 h-4 mr-2" />
-                  Delete Recording
+                  <X className="w-6 h-6" />
                 </Button>
               </div>
             </div>
