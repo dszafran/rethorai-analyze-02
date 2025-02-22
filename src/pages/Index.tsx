@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -260,6 +261,7 @@ const Index = () => {
               </div>
             </div>
           )}
+        </div>
 
         {/* Dashboard Section */}
         <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
