@@ -439,8 +439,8 @@ const Index = () => {
         </div>
 
         {/* Dashboard Section */}
-        <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
-          <div className="h-full">
+        <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
+          <div className="h-full max-w-sm">
             <DebateScoreCard />
           </div>
           <div className="space-y-6">
