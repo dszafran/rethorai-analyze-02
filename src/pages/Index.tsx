@@ -1,6 +1,5 @@
-
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, Users, FileText, Settings, HelpCircle, Shield, ArrowRight } from "lucide-react";
+import { Upload, UserRound, Home, Users, FileText, Settings, HelpCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -91,10 +90,6 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="text-white/70 hover:text-white">
-              <Shield className="h-4 w-4 mr-2" />
-              Protection
-            </Button>
             <Button
               variant="ghost"
               className="rounded-full p-2 hover:bg-white/10"
