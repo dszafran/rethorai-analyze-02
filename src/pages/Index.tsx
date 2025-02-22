@@ -14,6 +14,7 @@ const Index = () => {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [recordingFormat, setRecordingFormat] = useState<string>('audio/webm');
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -57,6 +58,21 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
+  const getSupportedMimeType = () => {
+    const types = [
+      'audio/mp3',
+      'audio/mpeg',
+      'audio/webm'
+    ];
+    
+    for (const type of types) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        return type;
+      }
+    }
+    return 'audio/webm'; // Fallback format
+  };
+
   const exportAudio = async () => {
     if (!audioUrl) {
       toast({
@@ -72,9 +88,10 @@ const Index = () => {
       const response = await fetch(audioUrl);
       const blob = await response.blob();
       
-      // Prepare FormData
+      // Prepare FormData with the correct extension based on format
       const formData = new FormData();
-      formData.append('audio', blob, 'recording.webm');
+      const extension = recordingFormat.includes('mp3') || recordingFormat.includes('mpeg') ? 'mp3' : 'webm';
+      formData.append('audio', blob, `recording.${extension}`);
 
       // This is where you'll make the API call to your Python backend
       // Example of how the API call would look:
@@ -85,7 +102,7 @@ const Index = () => {
 
       toast({
         title: "Export ready",
-        description: "Audio is ready to send",
+        description: `Audio ready to send (${extension} format)`,
       });
     } catch (error) {
       console.error('Export error:', error);
@@ -106,8 +123,12 @@ const Index = () => {
       setAudioContext(audioCtx);
       setMediaStream(stream);
 
+      const mimeType = getSupportedMimeType();
+      setRecordingFormat(mimeType);
+      console.log('Recording using format:', mimeType);
+
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm'
+        mimeType: mimeType
       });
       
       mediaRecorderRef.current = mediaRecorder;
@@ -120,13 +141,13 @@ const Index = () => {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const blob = new Blob(chunksRef.current, { type: mimeType });
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
         setMediaStream(null);
         toast({
           title: "Recording completed",
-          description: "Your recording is ready for playback",
+          description: `Recording saved in ${mimeType.includes('mp3') || mimeType.includes('mpeg') ? 'MP3' : 'WebM'} format`,
         });
       };
 
