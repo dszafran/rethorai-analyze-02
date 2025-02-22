@@ -6,7 +6,6 @@ import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
 import { PlayCircle, StopCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import DebateScoreCard from "@/components/DebateScoreCard";
 
 const Index = () => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -162,11 +161,6 @@ const Index = () => {
               )}
             </div>
           </div>
-        </div>
-
-        {/* Example Dashboard */}
-        <div className="max-w-2xl mx-auto mb-16">
-          <DebateScoreCard />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
