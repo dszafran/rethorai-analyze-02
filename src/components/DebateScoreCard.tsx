@@ -39,7 +39,7 @@ const DebateScoreCard = () => {
   ];
 
   return (
-    <Card className="bg-white/5 backdrop-blur-sm border-white/10">
+    <Card className="bg-transparent">
       <CardHeader>
         <CardTitle className="text-xl font-semibold text-white">Latest Debate Performance</CardTitle>
       </CardHeader>
