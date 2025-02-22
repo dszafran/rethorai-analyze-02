@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,12 @@ import { Link } from "react-router-dom";
 import DebateScoreCard from "@/components/DebateScoreCard";
 import RecordButton from "@/components/RecordButton";
 import VoiceVisualizer from "@/components/VoiceVisualizer";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Index = () => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -337,15 +344,24 @@ const Index = () => {
                 >
                   <X className="w-5 h-5" />
                 </Button>
-                <Button
-                  onClick={exportAudio}
-                  variant="ghost"
-                  size="icon"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                  disabled={isExporting}
-                >
-                  <ChartBar className="w-5 h-5" />
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={exportAudio}
+                        variant="ghost"
+                        size="icon"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                        disabled={isExporting}
+                      >
+                        <ChartBar className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Analyse</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <Button
                   onClick={handleDownload}
                   variant="ghost"
