@@ -8,9 +8,9 @@ interface AnalysisCardProps {
 
 const AnalysisCard = ({ title, children }: AnalysisCardProps) => {
   return (
-    <Card className="glass-panel border-theme-red/20">
+    <Card className="bg-[#221F26]/50 backdrop-blur-xl border border-[#9b87f5]/20 rounded-xl">
       <CardHeader>
-        <CardTitle className="text-lg font-medium text-theme-red">{title}</CardTitle>
+        <CardTitle className="text-lg font-medium text-[#9b87f5]">{title}</CardTitle>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
