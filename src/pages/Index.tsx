@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Share2, Square, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -58,6 +57,51 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
+  const convertToMp3 = async (audioBlob: Blob): Promise<Blob> => {
+    const audioContext = new AudioContext();
+    const arrayBuffer = await audioBlob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    
+    const offlineContext = new OfflineAudioContext({
+      numberOfChannels: audioBuffer.numberOfChannels,
+      length: audioBuffer.length,
+      sampleRate: audioBuffer.sampleRate,
+    });
+
+    const source = offlineContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(offlineContext.destination);
+    source.start();
+
+    const renderedBuffer = await offlineContext.startRendering();
+    const mp3Blob = await new Promise<Blob>((resolve) => {
+      const channels = [];
+      for (let i = 0; i < renderedBuffer.numberOfChannels; i++) {
+        channels.push(renderedBuffer.getChannelData(i));
+      }
+      
+      const mp3encoder = new MediaRecorder(new MediaStream(), {
+        mimeType: 'audio/mp3'
+      });
+      
+      const chunks: Blob[] = [];
+      mp3encoder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+      
+      mp3encoder.onstop = () => {
+        const mp3Blob = new Blob(chunks, { type: 'audio/mp3' });
+        resolve(mp3Blob);
+      };
+
+      mp3encoder.start();
+      source.stop();
+      mp3encoder.stop();
+    });
+
+    return mp3Blob;
+  };
+
   const exportAudio = async () => {
     if (!audioUrl) {
       toast({
@@ -71,11 +115,14 @@ const Index = () => {
     try {
       setIsExporting(true);
       const response = await fetch(audioUrl);
-      const blob = await response.blob();
+      const originalBlob = await response.blob();
       
-      // Prepare FormData for the future API endpoint
+      // Convert to MP3
+      const mp3Blob = await convertToMp3(originalBlob);
+      
+      // Prepare FormData with MP3
       const formData = new FormData();
-      formData.append('audio', blob, 'recording.webm');
+      formData.append('audio', mp3Blob, 'recording.mp3');
 
       // This is where you'll make the API call to your Python backend
       // Example of how the API call would look:
@@ -86,14 +133,14 @@ const Index = () => {
 
       toast({
         title: "Export ready",
-        description: "Frontend is prepared to send audio to backend",
+        description: "Audio converted to MP3 and ready to send",
       });
     } catch (error) {
       console.error('Export error:', error);
       toast({
         variant: "destructive",
         title: "Export failed",
-        description: "There was an error preparing the audio for export",
+        description: "There was an error converting the audio to MP3",
       });
     } finally {
       setIsExporting(false);
@@ -107,7 +154,10 @@ const Index = () => {
       setAudioContext(audioCtx);
       setMediaStream(stream);
 
-      const mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm' // We'll convert this to MP3 later
+      });
+      
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
