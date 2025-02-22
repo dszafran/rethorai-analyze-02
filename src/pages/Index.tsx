@@ -147,6 +147,22 @@ const Index = () => {
     }
   };
 
+  const getMimeType = () => {
+    const types = [
+      'audio/mp3',
+      'audio/mpeg',
+      'audio/webm;codecs=mp3',
+      'audio/webm'
+    ];
+    
+    for (const type of types) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        return type;
+      }
+    }
+    return 'audio/webm'; // Fallback format
+  };
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -154,8 +170,11 @@ const Index = () => {
       setAudioContext(audioCtx);
       setMediaStream(stream);
 
+      const mimeType = getMimeType();
+      console.log('Using MIME type:', mimeType);
+
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm' // We'll convert this to MP3 later
+        mimeType: mimeType
       });
       
       mediaRecorderRef.current = mediaRecorder;
@@ -168,13 +187,16 @@ const Index = () => {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const isMP3 = mimeType.includes('mp3') || mimeType.includes('mpeg');
+        const blob = new Blob(chunksRef.current, { 
+          type: isMP3 ? 'audio/mp3' : 'audio/webm'
+        });
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
         setMediaStream(null);
         toast({
           title: "Recording completed",
-          description: "Your recording is ready for playback",
+          description: `Recording saved in ${isMP3 ? 'MP3' : 'WebM'} format`,
         });
       };
 
