@@ -197,19 +197,21 @@ const Index = () => {
         </div>
 
         <div className="max-w-2xl mx-auto mb-24 flex flex-col items-center">
-          <div className="flex items-center gap-12 mb-12">
-            <button
-              onClick={handleUploadClick}
-              className="p-2 text-white/70 hover:text-white transition-colors"
-            >
-              <Upload size={48} />
-            </button>
+          <div className="flex flex-col items-center gap-6 mb-12">
             <button
               onClick={isRecording ? stopRecording : startRecording}
-              className="p-2 text-white/70 hover:text-white transition-colors"
+              className="p-6 text-white/70 hover:text-white transition-colors bg-white/5 hover:bg-white/10 rounded-full"
             >
-              <Mic size={48} />
+              <Mic size={64} />
             </button>
+            <Button
+              onClick={handleUploadClick}
+              variant="ghost"
+              className="text-white/70 hover:text-white"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Upload Audio
+            </Button>
           </div>
 
           <input
