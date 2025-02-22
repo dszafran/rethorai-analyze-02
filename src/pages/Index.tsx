@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
 import { PlayCircle, StopCircle } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -120,7 +119,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-16">
+        <div className="max-w-2xl mx-auto">
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8">
             <div className="flex flex-col items-center gap-6">
               <input
@@ -161,33 +160,6 @@ const Index = () => {
               )}
             </div>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <AnalysisCard title="Speech Analysis">
-            <div className="space-y-3 text-white/70">
-              <p className="text-lg">Upload your audio to analyze your debate performance.</p>
-              <p>We'll help you identify:</p>
-              <ul className="list-disc list-inside space-y-2">
-                <li>Logical fallacies</li>
-                <li>Emotional responses</li>
-                <li>Argument structure</li>
-                <li>Voice confidence</li>
-              </ul>
-            </div>
-          </AnalysisCard>
-
-          <AnalysisCard title="Improvement Tips">
-            <div className="space-y-3 text-white/70">
-              <p className="text-lg">Your personalized coaching will include:</p>
-              <ul className="list-disc list-inside space-y-2">
-                <li>Rhetoric enhancement suggestions</li>
-                <li>Stress management techniques</li>
-                <li>Structure improvements</li>
-                <li>Practice exercises</li>
-              </ul>
-            </div>
-          </AnalysisCard>
         </div>
       </div>
     </div>
