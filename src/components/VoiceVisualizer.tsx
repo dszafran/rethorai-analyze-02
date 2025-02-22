@@ -37,9 +37,9 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
       ctx.fillStyle = "rgb(0, 0, 0)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw the line with a paler color
+      // Draw the line
       ctx.lineWidth = 2;
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"; // Made the line more transparent
+      ctx.strokeStyle = "#ffffff";
       ctx.beginPath();
 
       const sliceWidth = canvas.width / bufferLength;
@@ -58,9 +58,9 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
         x += sliceWidth;
       }
 
-      // Add subtle glow effect with paler color
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = "rgba(255, 255, 255, 0.3)"; // Reduced glow opacity
+      // Add subtle glow effect
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
       ctx.stroke();
 
       // Reset shadow for next frame
