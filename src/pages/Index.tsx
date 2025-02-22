@@ -328,22 +328,40 @@ const Index = () => {
             <div className="flex flex-col items-center gap-4 w-full max-w-lg mt-6">
               <audio ref={audioPlayerRef} src={audioUrl} />
               <div className="bg-white/5 backdrop-blur-sm rounded-lg p-2 flex gap-2">
-                <Button
-                  onClick={togglePlayback}
-                  variant="ghost"
-                  size="icon"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  {isPlaying ? <Square className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                </Button>
-                <Button
-                  onClick={deleteRecording}
-                  variant="ghost"
-                  size="icon"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={togglePlayback}
+                        variant="ghost"
+                        size="icon"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                      >
+                        {isPlaying ? <Square className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isPlaying ? 'Stop' : 'Play'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={deleteRecording}
+                        variant="ghost"
+                        size="icon"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                      >
+                        <X className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Delete</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -362,14 +380,23 @@ const Index = () => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
-                <Button
-                  onClick={handleDownload}
-                  variant="ghost"
-                  size="icon"
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <Download className="w-5 h-5" />
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={handleDownload}
+                        variant="ghost"
+                        size="icon"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                      >
+                        <Download className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Download</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             </div>
           )}
