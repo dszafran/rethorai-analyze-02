@@ -8,10 +8,13 @@ interface ScoreProps {
 }
 
 const ScoreBar = ({ score, maxScore }: { score: number; maxScore: number }) => (
-  <div className="w-full bg-white/10 rounded-full h-2">
+  <div className="w-full bg-white/5 rounded-full h-2">
     <div 
-      className="bg-white h-full rounded-full transition-all duration-500"
-      style={{ width: `${(score / maxScore) * 100}%` }}
+      className="h-full rounded-full transition-all duration-500"
+      style={{ 
+        width: `${(score / maxScore) * 100}%`,
+        background: `linear-gradient(90deg, rgba(255,255,255,${score/100}) 0%, rgba(255,255,255,${(score/100) * 0.3}) 100%)`
+      }}
     />
   </div>
 );
