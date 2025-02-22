@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, FileText, Mic, Waveform, HelpCircle, ArrowRight } from "lucide-react";
+import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -81,7 +81,7 @@ const Index = () => {
                 Speaking Coach
               </Button>
               <Button variant="ghost" className="text-white/70 hover:text-white">
-                <Waveform className="h-4 w-4 mr-2" />
+                <AudioWaveform className="h-4 w-4 mr-2" />
                 Analyze Speech
               </Button>
               <Button variant="ghost" className="text-white/70 hover:text-white">
