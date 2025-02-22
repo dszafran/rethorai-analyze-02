@@ -3,6 +3,7 @@ import { ArrowLeft, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import ConversationWidget from "@/components/ConversationWidget";
 
 const SpeakingCoach = () => {
   const { toast } = useToast();
@@ -40,6 +41,7 @@ const SpeakingCoach = () => {
               <li>Progress tracking and analytics</li>
             </ul>
           </div>
+          <ConversationWidget />
         </div>
       </div>
     </div>
