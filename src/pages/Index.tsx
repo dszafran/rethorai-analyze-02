@@ -1,8 +1,8 @@
+
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Share2 } from "lucide-react";
+import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Share2, Square, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Play, Stop } from "lucide-react";
 import { Link } from "react-router-dom";
 import DebateScoreCard from "@/components/DebateScoreCard";
 import RecordButton from "@/components/RecordButton";
@@ -290,7 +290,7 @@ const Index = () => {
                 >
                   {isPlaying ? (
                     <>
-                      <Stop className="w-6 h-6" />
+                      <Square className="w-6 h-6" />
                       <span className="text-base">Stop</span>
                     </>
                   ) : (
