@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Upload } from "lucide-react";
+import { Upload, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -67,11 +67,20 @@ const Index = () => {
   return (
     <div className="min-h-screen w-full bg-black p-6">
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] bg-clip-text text-transparent tracking-tight">
-            RethorAI
-          </h1>
-          <p className="text-white/70 font-light tracking-wide">Your AI-powered debate coach</p>
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] bg-clip-text text-transparent tracking-tight">
+              RethorAI
+            </h1>
+            <p className="text-white/70 font-light tracking-wide">Your AI-powered debate coach</p>
+          </div>
+          <Button
+            variant="ghost"
+            className="rounded-full p-2 hover:bg-white/10"
+            onClick={() => toast({ title: "Profile", description: "Profile functionality coming soon!" })}
+          >
+            <UserRound className="h-6 w-6 text-white/70" />
+          </Button>
         </div>
 
         <div className="bg-black/30 rounded-xl p-8">
