@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ScoreProps {
   category: string;
@@ -39,11 +39,11 @@ const DebateScoreCard = () => {
   ];
 
   return (
-    <Card className="bg-transparent">
-      <CardHeader>
-        <CardTitle className="text-xl font-semibold text-white">Latest Debate Performance</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div>
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-white">Latest Debate Performance</h2>
+      </div>
+      <div className="space-y-4">
         {scores.map((score, index) => (
           <ScoreItem key={index} {...score} />
         ))}
@@ -53,8 +53,8 @@ const DebateScoreCard = () => {
             <span className="text-white text-xl font-semibold">88%</span>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
