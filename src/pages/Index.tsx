@@ -338,7 +338,7 @@ const Index = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{isPlaying ? 'Stop' : 'Play'}</p>
+                      <p>{isPlaying ? 'Stop' : 'Play'} audio</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -355,7 +355,7 @@ const Index = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Delete</p>
+                      <p>Delete audio</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -390,7 +390,7 @@ const Index = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Download recorded audio</p>
+                      <p>Download audio</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
