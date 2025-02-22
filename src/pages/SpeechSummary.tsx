@@ -29,7 +29,9 @@ const SpeechSummary = () => {
         
         <h1 className="text-4xl font-bold text-white mb-6">Speech Summary</h1>
         <div className="grid gap-6 md:grid-cols-2">
-          <DebateScoreCard />
+          <div className="h-full">
+            <DebateScoreCard />
+          </div>
           <div className="space-y-6">
             <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
               <h3 className="text-xl font-semibold text-white mb-3">Key Insights</h3>
