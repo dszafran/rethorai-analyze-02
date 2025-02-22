@@ -312,27 +312,6 @@ const Index = () => {
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-white/70 text-sm mt-6">
-            <span>or upload audio</span>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleUploadClick}
-                    variant="ghost"
-                    size="icon"
-                    className="text-white/70 hover:text-white hover:bg-white/10"
-                  >
-                    <Upload className="w-4 h-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Upload</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
           <input
             type="file"
             ref={fileInputRef}
@@ -414,7 +393,46 @@ const Index = () => {
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={handleUploadClick}
+                        variant="ghost"
+                        size="icon"
+                        className="text-white/70 hover:text-white hover:bg-white/10"
+                      >
+                        <Upload className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Upload audio</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
+            </div>
+          )}
+
+          {!audioUrl && (
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-2 flex gap-2 mt-6">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      onClick={handleUploadClick}
+                      variant="ghost"
+                      size="icon"
+                      className="text-white/70 hover:text-white hover:bg-white/10"
+                    >
+                      <Upload className="w-4 h-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upload audio</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
         </div>
