@@ -1,5 +1,5 @@
 
-import { ArrowLeft, Upload, Mic } from "lucide-react";
+import { ArrowLeft, Upload, Mic, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
@@ -78,12 +78,21 @@ const SpeakingCoach = () => {
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <Link to="/">
-          <Button variant="ghost" className="text-white/70 hover:text-white mb-8">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+        <div className="flex justify-between items-center mb-8">
+          <Link to="/">
+            <Button variant="ghost" className="text-white/70 hover:text-white">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            className="rounded-full p-2 hover:bg-white/10"
+            onClick={() => toast({ title: "Profile", description: "Profile functionality coming soon!" })}
+          >
+            <UserRound className="h-6 w-6 text-white/70" />
           </Button>
-        </Link>
+        </div>
         
         <h1 className="text-4xl font-bold text-white mb-6">Speaking Coach</h1>
         <div className="grid gap-6">
