@@ -4,12 +4,18 @@ import RecordButton from "@/components/RecordButton";
 import VoiceVisualizer from "@/components/VoiceVisualizer";
 import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
+import { PlayCircle, StopCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
 
   const startRecording = async () => {
@@ -18,9 +24,22 @@ const Index = () => {
       const context = new AudioContext();
       
       mediaRecorderRef.current = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+      
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data);
+      };
+
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioUrl(audioUrl);
+      };
+
       setMediaStream(stream);
       setAudioContext(context);
       setIsRecording(true);
+      setAudioUrl(null);
       
       mediaRecorderRef.current.start();
       
@@ -47,7 +66,7 @@ const Index = () => {
       
       toast({
         title: "Recording stopped",
-        description: "Analyzing your speech...",
+        description: "Processing your recording...",
       });
     }
   };
@@ -60,13 +79,34 @@ const Index = () => {
     }
   };
 
+  const togglePlayback = () => {
+    if (!audioPlayerRef.current || !audioUrl) return;
+
+    if (isPlaying) {
+      audioPlayerRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioPlayerRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (mediaStream) {
         mediaStream.getTracks().forEach(track => track.stop());
       }
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
     };
-  }, [mediaStream]);
+  }, [mediaStream, audioUrl]);
+
+  useEffect(() => {
+    if (audioPlayerRef.current) {
+      audioPlayerRef.current.onended = () => setIsPlaying(false);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-background p-6">
@@ -83,7 +123,31 @@ const Index = () => {
               audioContext={audioContext}
               mediaStream={mediaStream}
             />
-            <RecordButton isRecording={isRecording} onClick={toggleRecording} />
+            <div className="flex flex-col items-center gap-4">
+              <RecordButton isRecording={isRecording} onClick={toggleRecording} />
+              {audioUrl && (
+                <div className="flex flex-col items-center gap-2">
+                  <audio ref={audioPlayerRef} src={audioUrl} />
+                  <Button
+                    onClick={togglePlayback}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    {isPlaying ? (
+                      <>
+                        <StopCircle size={20} />
+                        Stop Playback
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle size={20} />
+                        Play Recording
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
