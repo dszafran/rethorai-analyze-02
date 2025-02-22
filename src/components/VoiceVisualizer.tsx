@@ -17,7 +17,7 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
 
     const analyzer = audioContext.createAnalyser();
     analyzerRef.current = analyzer;
-    analyzer.fftSize = 128; // Reduced for crisper visualization
+    analyzer.fftSize = 256; // Increased for smoother visualization
     
     const source = audioContext.createMediaStreamSource(mediaStream);
     source.connect(analyzer);
@@ -26,74 +26,61 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
     const ctx = canvas.getContext("2d")!;
     const bufferLength = analyzer.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
+    const timeDataArray = new Uint8Array(bufferLength);
 
     const draw = () => {
       if (!isRecording) return;
       
       animationFrameRef.current = requestAnimationFrame(draw);
       analyzer.getByteFrequencyData(dataArray);
+      analyzer.getByteTimeDomainData(timeDataArray);
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      // Clear canvas with semi-transparent black
+      ctx.fillStyle = "rgba(0, 0, 0, 0.9)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const barWidth = (canvas.width / bufferLength) * 2.5;
-      let x = canvas.width / 2;
-      
-      // Draw bars in both directions from the center
+      // Draw frequency bars
+      const barWidth = (canvas.width / bufferLength) * 2;
+      let x = 0;
+
+      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
       for (let i = 0; i < bufferLength; i++) {
         const barHeight = (dataArray[i] / 255) * (canvas.height / 2);
-        
-        // Create gradient for bars
-        const gradient = ctx.createLinearGradient(0, canvas.height / 2 - barHeight, 0, canvas.height / 2 + barHeight);
-        gradient.addColorStop(0, "rgba(234, 56, 76, 0.8)");
-        gradient.addColorStop(1, "rgba(234, 56, 76, 0.4)");
-        
-        ctx.fillStyle = gradient;
-        
-        // Draw bar upward from center
-        ctx.fillRect(
-          x, 
-          canvas.height / 2 - barHeight, 
-          barWidth, 
-          barHeight
-        );
-        
-        // Draw bar downward from center (mirror)
-        ctx.fillRect(
-          x, 
-          canvas.height / 2, 
-          barWidth, 
-          barHeight
-        );
-        
-        // Draw bar on the left side (mirror)
-        ctx.fillRect(
-          canvas.width - x - barWidth, 
-          canvas.height / 2 - barHeight, 
-          barWidth, 
-          barHeight
-        );
-        
-        ctx.fillRect(
-          canvas.width - x - barWidth, 
-          canvas.height / 2, 
-          barWidth, 
-          barHeight
-        );
-        
-        x += barWidth + 1;
+        ctx.fillRect(x, canvas.height / 2 - barHeight / 2, barWidth - 1, barHeight);
+        x += barWidth;
       }
-      
-      // Add glow effect
-      ctx.globalCompositeOperation = "lighter";
-      ctx.filter = "blur(4px)";
-      ctx.globalAlpha = 0.1;
-      ctx.fillStyle = "rgba(234, 56, 76, 0.2)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.filter = "none";
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = "source-over";
+
+      // Draw waveform
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.lineWidth = 2;
+
+      const sliceWidth = canvas.width / bufferLength;
+      x = 0;
+
+      ctx.moveTo(0, canvas.height * 0.75);
+      for (let i = 0; i < bufferLength; i++) {
+        const v = timeDataArray[i] / 128.0;
+        const y = (v * canvas.height / 4) + (canvas.height * 0.75);
+        
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+        x += sliceWidth;
+      }
+
+      ctx.lineTo(canvas.width, canvas.height * 0.75);
+      ctx.stroke();
+
+      // Add subtle glow effect
+      ctx.filter = 'blur(1px)';
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.stroke();
+      ctx.filter = 'none';
+      ctx.globalCompositeOperation = 'source-over';
     };
 
     draw();
@@ -110,9 +97,9 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
   return (
     <canvas
       ref={canvasRef}
-      width={300}
-      height={100}
-      className="w-full h-24 rounded-lg bg-black/20 backdrop-blur-sm"
+      width={600}
+      height={200}
+      className="w-full h-48 rounded-lg bg-black/90 backdrop-blur-sm"
     />
   );
 };
