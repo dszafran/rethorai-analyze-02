@@ -187,13 +187,13 @@ const Index = () => {
           <div className="flex items-center gap-12 mb-12">
             <button
               onClick={handleUploadClick}
-              className="p-2 text-white hover:text-white/70 transition-colors"
+              className="p-2 text-white/70 hover:text-white transition-colors"
             >
               <Upload size={48} />
             </button>
             <button
               onClick={isRecording ? stopRecording : startRecording}
-              className="p-2 text-white hover:text-white/70 transition-colors"
+              className="p-2 text-white/70 hover:text-white transition-colors"
             >
               <Mic size={48} />
             </button>
