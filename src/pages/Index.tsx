@@ -304,41 +304,31 @@ const Index = () => {
           {audioUrl && (
             <div className="flex flex-col items-center gap-4 w-full max-w-lg mt-6">
               <audio ref={audioPlayerRef} src={audioUrl} />
-              <div className="flex gap-2 w-full justify-center">
+              <div className="bg-white/5 backdrop-blur-sm rounded-lg p-2 flex gap-2">
                 <Button
                   onClick={togglePlayback}
-                  variant="outline"
-                  size="lg"
-                  className="w-[200px] bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6"
+                  variant="ghost"
+                  size="icon"
+                  className="text-white/70 hover:text-white hover:bg-white/10"
                 >
-                  {isPlaying ? (
-                    <>
-                      <Square className="w-6 h-6" />
-                      <span className="text-base">Stop</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-6 h-6" />
-                      <span className="text-base">Play</span>
-                    </>
-                  )}
+                  {isPlaying ? <Square className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                 </Button>
                 <Button
                   onClick={deleteRecording}
-                  variant="outline"
-                  size="lg"
-                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border-white/20 py-6"
+                  variant="ghost"
+                  size="icon"
+                  className="text-white/70 hover:text-white hover:bg-white/10"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </Button>
                 <Button
                   onClick={exportAudio}
-                  variant="outline"
-                  size="lg"
-                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border-white/20 py-6"
+                  variant="ghost"
+                  size="icon"
+                  className="text-white/70 hover:text-white hover:bg-white/10"
                   disabled={isExporting}
                 >
-                  <Share2 className="w-6 h-6" />
+                  <Share2 className="w-5 h-5" />
                 </Button>
               </div>
             </div>
