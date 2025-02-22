@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -389,7 +390,7 @@ const Index = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Download</p>
+                      <p>Download recorded audio</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
