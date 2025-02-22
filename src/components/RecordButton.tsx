@@ -10,14 +10,13 @@ const RecordButton = ({ isRecording, onClick }: RecordButtonProps) => {
   return (
     <button
       onClick={onClick}
-      className={`relative p-6 rounded-full transition-all duration-300 ${
+      className={`p-2 transition-colors ${
         isRecording
-          ? "bg-theme-red text-white"
-          : "bg-white/10 hover:bg-theme-red/20 text-theme-red"
+          ? "text-theme-red animate-pulse"
+          : "text-white hover:text-white/70"
       }`}
     >
-      <Mic size={32} className="relative z-10" />
-      {isRecording && <div className="recording-pulse" />}
+      <Mic size={32} />
     </button>
   );
 };

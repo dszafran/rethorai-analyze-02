@@ -187,16 +187,19 @@ const Index = () => {
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8">
             <div className="flex flex-col items-center gap-6">
               <div className="w-full flex flex-col items-center gap-6">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-8">
                   <button
                     onClick={handleUploadClick}
-                    className="relative p-6 rounded-full bg-white/10 hover:bg-theme-red/20 text-theme-red transition-all duration-300"
+                    className="p-2 text-white hover:text-white/70 transition-colors"
                   >
-                    <Upload size={32} className="relative z-10" />
+                    <Upload size={32} />
                   </button>
-                  <div className="relative">
-                    <RecordButton isRecording={isRecording} onClick={isRecording ? stopRecording : startRecording} />
-                  </div>
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className="p-2 text-white hover:text-white/70 transition-colors"
+                  >
+                    <Mic size={32} />
+                  </button>
                 </div>
                 <input
                   type="file"
