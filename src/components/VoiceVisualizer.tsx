@@ -17,7 +17,7 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
 
     const analyzer = audioContext.createAnalyser();
     analyzerRef.current = analyzer;
-    analyzer.fftSize = 512; // Increased for more detailed visualization
+    analyzer.fftSize = 512;
     
     const source = audioContext.createMediaStreamSource(mediaStream);
     source.connect(analyzer);
@@ -41,13 +41,15 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
       const centerY = canvas.height / 2;
       const lineWidth = 2;
       const gap = 1;
-      const totalWidth = (lineWidth + gap) * bufferLength;
+      const usableBufferLength = Math.floor(bufferLength / 2); // Use half the buffer for each side
+      const totalWidth = (lineWidth + gap) * usableBufferLength;
       const startX = (canvas.width - totalWidth) / 2;
 
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
       ctx.lineWidth = lineWidth;
 
-      for (let i = 0; i < bufferLength; i++) {
+      // Draw left side
+      for (let i = 0; i < usableBufferLength; i++) {
         const x = startX + i * (lineWidth + gap);
         const height = (dataArray[i] / 255) * (canvas.height / 2);
         
@@ -66,10 +68,30 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
         ctx.stroke();
       }
 
+      // Draw right side (mirrored)
+      for (let i = 0; i < usableBufferLength; i++) {
+        const x = canvas.width - startX - i * (lineWidth + gap);
+        const height = (dataArray[i] / 255) * (canvas.height / 2);
+        
+        ctx.beginPath();
+        ctx.moveTo(x, centerY - height);
+        ctx.lineTo(x, centerY + height);
+        
+        const gradient = ctx.createLinearGradient(x, centerY - height, x, centerY + height);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.95)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+        
+        ctx.strokeStyle = gradient;
+        ctx.stroke();
+      }
+
       // Add glow effect
       ctx.filter = 'blur(2px)';
       ctx.globalCompositeOperation = 'lighter';
-      for (let i = 0; i < bufferLength; i++) {
+      
+      // Glow effect for left side
+      for (let i = 0; i < usableBufferLength; i++) {
         const x = startX + i * (lineWidth + gap);
         const height = (dataArray[i] / 255) * (canvas.height / 2);
         
@@ -79,6 +101,19 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.stroke();
       }
+
+      // Glow effect for right side
+      for (let i = 0; i < usableBufferLength; i++) {
+        const x = canvas.width - startX - i * (lineWidth + gap);
+        const height = (dataArray[i] / 255) * (canvas.height / 2);
+        
+        ctx.beginPath();
+        ctx.moveTo(x, centerY - height);
+        ctx.lineTo(x, centerY + height);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.stroke();
+      }
+
       ctx.filter = 'none';
       ctx.globalCompositeOperation = 'source-over';
     };
