@@ -1,5 +1,6 @@
+
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, Users, FileText, Settings, HelpCircle, ArrowRight } from "lucide-react";
+import { Upload, UserRound, Home, FileText, Mic, Waveform, HelpCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -76,12 +77,12 @@ const Index = () => {
                 Home
               </Button>
               <Button variant="ghost" className="text-white/70 hover:text-white">
-                <FileText className="h-4 w-4 mr-2" />
-                Features
+                <Mic className="h-4 w-4 mr-2" />
+                Speaking Coach
               </Button>
               <Button variant="ghost" className="text-white/70 hover:text-white">
-                <Users className="h-4 w-4 mr-2" />
-                Community
+                <Waveform className="h-4 w-4 mr-2" />
+                Analyze Speech
               </Button>
               <Button variant="ghost" className="text-white/70 hover:text-white">
                 <HelpCircle className="h-4 w-4 mr-2" />
