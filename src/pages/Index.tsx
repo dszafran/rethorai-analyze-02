@@ -1,6 +1,5 @@
-
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar } from "lucide-react";
+import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
@@ -207,6 +206,22 @@ const Index = () => {
     }
   };
 
+  const handleDownload = () => {
+    if (!audioUrl) return;
+    
+    const link = document.createElement('a');
+    link.href = audioUrl;
+    link.download = `recording.${recordingFormat.includes('mp3') || recordingFormat.includes('mpeg') ? 'mp3' : 'webm'}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Download started",
+      description: "Your audio file is being downloaded",
+    });
+  };
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
       {/* Navigation Bar */}
@@ -330,6 +345,14 @@ const Index = () => {
                   disabled={isExporting}
                 >
                   <ChartBar className="w-5 h-5" />
+                </Button>
+                <Button
+                  onClick={handleDownload}
+                  variant="ghost"
+                  size="icon"
+                  className="text-white/70 hover:text-white hover:bg-white/10"
+                >
+                  <Download className="w-5 h-5" />
                 </Button>
               </div>
             </div>
