@@ -288,7 +288,7 @@ const Index = () => {
               onClick={handleUploadClick}
               variant="ghost"
               size="sm"
-              className="text-white/70 hover:text-white p-0"
+              className="text-white/70 hover:text-white hover:bg-white/10 p-0"
             >
               <Upload className="w-4 h-4" />
             </Button>
