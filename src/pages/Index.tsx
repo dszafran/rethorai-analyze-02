@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, Brain } from "lucide-react";
+import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
@@ -329,7 +329,7 @@ const Index = () => {
                   className="text-white/70 hover:text-white hover:bg-white/10"
                   disabled={isExporting}
                 >
-                  <Brain className="w-5 h-5" />
+                  <ChartBar className="w-5 h-5" />
                 </Button>
               </div>
             </div>
