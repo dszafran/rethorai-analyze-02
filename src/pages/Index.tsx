@@ -57,51 +57,6 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
-  const convertToMp3 = async (audioBlob: Blob): Promise<Blob> => {
-    const audioContext = new AudioContext();
-    const arrayBuffer = await audioBlob.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    
-    const offlineContext = new OfflineAudioContext({
-      numberOfChannels: audioBuffer.numberOfChannels,
-      length: audioBuffer.length,
-      sampleRate: audioBuffer.sampleRate,
-    });
-
-    const source = offlineContext.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(offlineContext.destination);
-    source.start();
-
-    const renderedBuffer = await offlineContext.startRendering();
-    const mp3Blob = await new Promise<Blob>((resolve) => {
-      const channels = [];
-      for (let i = 0; i < renderedBuffer.numberOfChannels; i++) {
-        channels.push(renderedBuffer.getChannelData(i));
-      }
-      
-      const mp3encoder = new MediaRecorder(new MediaStream(), {
-        mimeType: 'audio/mp3'
-      });
-      
-      const chunks: Blob[] = [];
-      mp3encoder.ondataavailable = (event) => {
-        chunks.push(event.data);
-      };
-      
-      mp3encoder.onstop = () => {
-        const mp3Blob = new Blob(chunks, { type: 'audio/mp3' });
-        resolve(mp3Blob);
-      };
-
-      mp3encoder.start();
-      source.stop();
-      mp3encoder.stop();
-    });
-
-    return mp3Blob;
-  };
-
   const exportAudio = async () => {
     if (!audioUrl) {
       toast({
@@ -115,14 +70,11 @@ const Index = () => {
     try {
       setIsExporting(true);
       const response = await fetch(audioUrl);
-      const originalBlob = await response.blob();
+      const blob = await response.blob();
       
-      // Convert to MP3
-      const mp3Blob = await convertToMp3(originalBlob);
-      
-      // Prepare FormData with MP3
+      // Prepare FormData
       const formData = new FormData();
-      formData.append('audio', mp3Blob, 'recording.mp3');
+      formData.append('audio', blob, 'recording.webm');
 
       // This is where you'll make the API call to your Python backend
       // Example of how the API call would look:
@@ -133,34 +85,18 @@ const Index = () => {
 
       toast({
         title: "Export ready",
-        description: "Audio converted to MP3 and ready to send",
+        description: "Audio is ready to send",
       });
     } catch (error) {
       console.error('Export error:', error);
       toast({
         variant: "destructive",
         title: "Export failed",
-        description: "There was an error converting the audio to MP3",
+        description: "There was an error preparing the audio",
       });
     } finally {
       setIsExporting(false);
     }
-  };
-
-  const getMimeType = () => {
-    const types = [
-      'audio/mp3',
-      'audio/mpeg',
-      'audio/webm;codecs=mp3',
-      'audio/webm'
-    ];
-    
-    for (const type of types) {
-      if (MediaRecorder.isTypeSupported(type)) {
-        return type;
-      }
-    }
-    return 'audio/webm'; // Fallback format
   };
 
   const startRecording = async () => {
@@ -170,11 +106,8 @@ const Index = () => {
       setAudioContext(audioCtx);
       setMediaStream(stream);
 
-      const mimeType = getMimeType();
-      console.log('Using MIME type:', mimeType);
-
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: mimeType
+        mimeType: 'audio/webm'
       });
       
       mediaRecorderRef.current = mediaRecorder;
@@ -187,16 +120,13 @@ const Index = () => {
       };
 
       mediaRecorder.onstop = () => {
-        const isMP3 = mimeType.includes('mp3') || mimeType.includes('mpeg');
-        const blob = new Blob(chunksRef.current, { 
-          type: isMP3 ? 'audio/mp3' : 'audio/webm'
-        });
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
         setMediaStream(null);
         toast({
           title: "Recording completed",
-          description: `Recording saved in ${isMP3 ? 'MP3' : 'WebM'} format`,
+          description: "Your recording is ready for playback",
         });
       };
 
