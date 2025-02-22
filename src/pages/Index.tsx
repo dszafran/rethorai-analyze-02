@@ -238,12 +238,12 @@ const Index = () => {
           {audioUrl && (
             <div className="flex flex-col items-center gap-4 w-full max-w-lg mt-6">
               <audio ref={audioPlayerRef} src={audioUrl} />
-              <div className="flex gap-2 w-full">
+              <div className="flex gap-2 w-full justify-center">
                 <Button
                   onClick={togglePlayback}
                   variant="outline"
                   size="lg"
-                  className={`bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6 ${isPlaying ? 'w-[200px]' : 'flex-1'}`}
+                  className="w-[200px] bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6"
                 >
                   {isPlaying ? (
                     <>
@@ -253,7 +253,7 @@ const Index = () => {
                   ) : (
                     <>
                       <PlayCircle className="w-6 h-6" />
-                      <span className="text-base">Play Recording</span>
+                      <span className="text-base">Play</span>
                     </>
                   )}
                 </Button>
