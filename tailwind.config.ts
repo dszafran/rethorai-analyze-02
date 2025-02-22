@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Orbitron', 'sans-serif'],
+        sans: ['Chakra Petch', 'sans-serif'],
       },
       colors: {
         theme: {
