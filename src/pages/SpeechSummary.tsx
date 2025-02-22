@@ -28,29 +28,25 @@ const SpeechSummary = () => {
         </div>
         
         <h1 className="text-4xl font-bold text-white mb-6">Speech Summary</h1>
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="h-full">
-            <DebateScoreCard />
+        <div className="grid gap-6 md:grid-cols-3">
+          <DebateScoreCard />
+          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+            <h3 className="text-xl font-semibold text-white mb-3">Key Insights</h3>
+            <ul className="space-y-2 text-white/70">
+              <li>• Strong evidence presentation and logical flow</li>
+              <li>• Excellent time management throughout</li>
+              <li>• Room for improvement in rebuttal techniques</li>
+              <li>• Consistent speaking clarity and pace</li>
+            </ul>
           </div>
-          <div className="space-y-6">
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-3">Key Insights</h3>
-              <ul className="space-y-2 text-white/70">
-                <li>• Strong evidence presentation and logical flow</li>
-                <li>• Excellent time management throughout</li>
-                <li>• Room for improvement in rebuttal techniques</li>
-                <li>• Consistent speaking clarity and pace</li>
-              </ul>
-            </div>
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-              <h3 className="text-xl font-semibold text-white mb-3">Recommendations</h3>
-              <ul className="space-y-2 text-white/70">
-                <li>• Practice anticipating counter-arguments</li>
-                <li>• Focus on strengthening rebuttal responses</li>
-                <li>• Maintain current time management strategies</li>
-                <li>• Consider incorporating more varied evidence types</li>
-              </ul>
-            </div>
+          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+            <h3 className="text-xl font-semibold text-white mb-3">Recommendations</h3>
+            <ul className="space-y-2 text-white/70">
+              <li>• Practice anticipating counter-arguments</li>
+              <li>• Focus on strengthening rebuttal responses</li>
+              <li>• Maintain current time management strategies</li>
+              <li>• Consider incorporating more varied evidence types</li>
+            </ul>
           </div>
         </div>
       </div>
