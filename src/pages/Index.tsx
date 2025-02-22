@@ -243,12 +243,12 @@ const Index = () => {
                   onClick={togglePlayback}
                   variant="outline"
                   size="lg"
-                  className="flex-1 bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6"
+                  className={`bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center justify-center gap-2 font-medium tracking-wide py-6 ${isPlaying ? 'w-[200px]' : 'flex-1'}`}
                 >
                   {isPlaying ? (
                     <>
                       <StopCircle className="w-6 h-6" />
-                      <span className="text-base">Stop Playback</span>
+                      <span className="text-base">Stop</span>
                     </>
                   ) : (
                     <>
