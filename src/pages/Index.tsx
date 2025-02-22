@@ -196,24 +196,35 @@ const Index = () => {
         </div>
 
         <div className="max-w-2xl mx-auto mb-24 flex flex-col items-center">
-          <div className="flex flex-col items-center gap-6 mb-12">
+          <div className="flex flex-col items-center gap-6">
             <button
               onClick={isRecording ? stopRecording : startRecording}
               className="p-6 text-white/70 hover:text-white transition-colors bg-white/5 hover:bg-white/10 rounded-full"
             >
               <Mic size={64} />
             </button>
-            <div className="flex items-center gap-2 text-white/70 text-sm">
-              <span>or upload audio</span>
-              <Button
-                onClick={handleUploadClick}
-                variant="ghost"
-                size="sm"
-                className="text-white/70 hover:text-white p-0"
-              >
-                <Upload className="w-4 h-4" />
-              </Button>
+          </div>
+
+          {isRecording && (
+            <div className="w-full max-w-lg mt-6">
+              <VoiceVisualizer
+                isRecording={isRecording}
+                audioContext={audioContext}
+                mediaStream={mediaStream}
+              />
             </div>
+          )}
+
+          <div className="flex items-center gap-2 text-white/70 text-sm mt-6">
+            <span>or upload audio</span>
+            <Button
+              onClick={handleUploadClick}
+              variant="ghost"
+              size="sm"
+              className="text-white/70 hover:text-white p-0"
+            >
+              <Upload className="w-4 h-4" />
+            </Button>
           </div>
 
           <input
@@ -223,17 +234,9 @@ const Index = () => {
             accept="audio/*"
             className="hidden"
           />
-          {isRecording && (
-            <div className="w-full max-w-lg">
-              <VoiceVisualizer
-                isRecording={isRecording}
-                audioContext={audioContext}
-                mediaStream={mediaStream}
-              />
-            </div>
-          )}
+          
           {audioUrl && (
-            <div className="flex flex-col items-center gap-4 w-full max-w-lg">
+            <div className="flex flex-col items-center gap-4 w-full max-w-lg mt-6">
               <audio ref={audioPlayerRef} src={audioUrl} />
               <div className="flex flex-col gap-2 w-full">
                 <Button
