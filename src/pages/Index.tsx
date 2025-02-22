@@ -6,12 +6,19 @@ import { useToast } from "@/components/ui/use-toast";
 import { PlayCircle, StopCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import DebateScoreCard from "@/components/DebateScoreCard";
+import RecordButton from "@/components/RecordButton";
+import VoiceVisualizer from "@/components/VoiceVisualizer";
 
 const Index = () => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,6 +58,60 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioCtx = new AudioContext();
+      setAudioContext(audioCtx);
+      setMediaStream(stream);
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+        setAudioUrl(url);
+        setMediaStream(null);
+        toast({
+          title: "Recording completed",
+          description: "Your recording is ready for playback",
+        });
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      toast({
+        title: "Recording started",
+        description: "Speak clearly into your microphone",
+      });
+    } catch (error) {
+      console.error('Error accessing microphone:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not access microphone. Please check permissions.",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+    }
+  };
+
   useEffect(() => {
     if (audioPlayerRef.current) {
       audioPlayerRef.current.onended = () => setIsPlaying(false);
@@ -62,8 +123,11 @@ const Index = () => {
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl);
       }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
     };
-  }, [audioUrl]);
+  }, [audioUrl, mediaStream]);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
@@ -123,42 +187,58 @@ const Index = () => {
         <div className="max-w-2xl mx-auto mb-12">
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8">
             <div className="flex flex-col items-center gap-6">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                accept="audio/*"
-                className="hidden"
-              />
-              <Button
-                onClick={handleUploadClick}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-300 py-6 text-lg flex items-center gap-3 font-medium tracking-wide rounded-xl"
-              >
-                <Upload size={24} />
-                Upload Audio File
-              </Button>
-              {audioUrl && (
-                <div className="flex flex-col items-center gap-2 w-full">
-                  <audio ref={audioPlayerRef} src={audioUrl} />
+              <div className="w-full flex flex-col items-center gap-6">
+                <div className="flex items-center gap-4">
                   <Button
-                    onClick={togglePlayback}
-                    variant="outline"
-                    className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
+                    onClick={handleUploadClick}
+                    className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-300 py-6 text-lg flex items-center gap-3 font-medium tracking-wide rounded-xl"
                   >
-                    {isPlaying ? (
-                      <>
-                        <StopCircle size={20} />
-                        Stop Playback
-                      </>
-                    ) : (
-                      <>
-                        <PlayCircle size={20} />
-                        Play Recording
-                      </>
-                    )}
+                    <Upload size={24} />
+                    Upload Audio File
                   </Button>
+                  <div className="relative">
+                    <RecordButton isRecording={isRecording} onClick={isRecording ? stopRecording : startRecording} />
+                  </div>
                 </div>
-              )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  accept="audio/*"
+                  className="hidden"
+                />
+                {isRecording && (
+                  <div className="w-full">
+                    <VoiceVisualizer
+                      isRecording={isRecording}
+                      audioContext={audioContext}
+                      mediaStream={mediaStream}
+                    />
+                  </div>
+                )}
+                {audioUrl && (
+                  <div className="flex flex-col items-center gap-2 w-full">
+                    <audio ref={audioPlayerRef} src={audioUrl} />
+                    <Button
+                      onClick={togglePlayback}
+                      variant="outline"
+                      className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
+                    >
+                      {isPlaying ? (
+                        <>
+                          <StopCircle size={20} />
+                          Stop Playback
+                        </>
+                      ) : (
+                        <>
+                          <PlayCircle size={20} />
+                          Play Recording
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
