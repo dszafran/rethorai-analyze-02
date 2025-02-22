@@ -183,65 +183,60 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-12">
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8">
-            <div className="flex flex-col items-center gap-6">
-              <div className="w-full flex flex-col items-center gap-6">
-                <div className="flex items-center gap-8">
-                  <button
-                    onClick={handleUploadClick}
-                    className="p-2 text-white hover:text-white/70 transition-colors"
-                  >
-                    <Upload size={32} />
-                  </button>
-                  <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className="p-2 text-white hover:text-white/70 transition-colors"
-                  >
-                    <Mic size={32} />
-                  </button>
-                </div>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  accept="audio/*"
-                  className="hidden"
-                />
-                {isRecording && (
-                  <div className="w-full">
-                    <VoiceVisualizer
-                      isRecording={isRecording}
-                      audioContext={audioContext}
-                      mediaStream={mediaStream}
-                    />
-                  </div>
-                )}
-                {audioUrl && (
-                  <div className="flex flex-col items-center gap-2 w-full">
-                    <audio ref={audioPlayerRef} src={audioUrl} />
-                    <Button
-                      onClick={togglePlayback}
-                      variant="outline"
-                      className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
-                    >
-                      {isPlaying ? (
-                        <>
-                          <StopCircle size={20} />
-                          Stop Playback
-                        </>
-                      ) : (
-                        <>
-                          <PlayCircle size={20} />
-                          Play Recording
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
+        <div className="max-w-2xl mx-auto mb-12 flex flex-col items-center">
+          <div className="flex items-center gap-12 mb-8">
+            <button
+              onClick={handleUploadClick}
+              className="p-2 text-white hover:text-white/70 transition-colors"
+            >
+              <Upload size={48} />
+            </button>
+            <button
+              onClick={isRecording ? stopRecording : startRecording}
+              className="p-2 text-white hover:text-white/70 transition-colors"
+            >
+              <Mic size={48} />
+            </button>
           </div>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            accept="audio/*"
+            className="hidden"
+          />
+          {isRecording && (
+            <div className="w-full max-w-lg">
+              <VoiceVisualizer
+                isRecording={isRecording}
+                audioContext={audioContext}
+                mediaStream={mediaStream}
+              />
+            </div>
+          )}
+          {audioUrl && (
+            <div className="flex flex-col items-center gap-2 w-full max-w-lg">
+              <audio ref={audioPlayerRef} src={audioUrl} />
+              <Button
+                onClick={togglePlayback}
+                variant="outline"
+                className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
+              >
+                {isPlaying ? (
+                  <>
+                    <StopCircle size={20} />
+                    Stop Playback
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle size={20} />
+                    Play Recording
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* Dashboard Section */}

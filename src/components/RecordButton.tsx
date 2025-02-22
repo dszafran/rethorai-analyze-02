@@ -16,7 +16,7 @@ const RecordButton = ({ isRecording, onClick }: RecordButtonProps) => {
           : "text-white hover:text-white/70"
       }`}
     >
-      <Mic size={32} />
+      <Mic size={48} />
     </button>
   );
 };
