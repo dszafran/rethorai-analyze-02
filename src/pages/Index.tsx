@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -206,15 +207,15 @@ const Index = () => {
             <div className="flex items-center gap-2 text-white/70 text-sm">
               <span>or upload audio</span>
               <ArrowRight className="w-4 h-4" />
+              <Button
+                onClick={handleUploadClick}
+                variant="ghost"
+                size="sm"
+                className="text-white/70 hover:text-white p-0"
+              >
+                <Upload className="w-4 h-4" />
+              </Button>
             </div>
-            <Button
-              onClick={handleUploadClick}
-              variant="ghost"
-              className="text-white/70 hover:text-white"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Audio
-            </Button>
           </div>
 
           <input
