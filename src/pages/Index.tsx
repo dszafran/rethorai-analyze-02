@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,191 +8,224 @@ import { Link } from "react-router-dom";
 import DebateScoreCard from "@/components/DebateScoreCard";
 
 const Index = () => {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioURL, setAudioURL] = useState<string | null>(null);
+  const [transcription, setTranscription] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<any>(null);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const audioChunks = useRef<Blob[]>([]);
   const { toast } = useToast();
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('audio/')) {
-      toast({
-        variant: "destructive",
-        title: "Invalid file type",
-        description: "Please upload an audio file",
-      });
-      return;
-    }
-
-    const url = URL.createObjectURL(file);
-    setAudioUrl(url);
-    toast({
-      title: "File uploaded",
-      description: "Your audio file is ready for analysis",
-    });
-  };
-
-  const togglePlayback = () => {
-    if (!audioPlayerRef.current || !audioUrl) return;
-
-    if (isPlaying) {
-      audioPlayerRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioPlayerRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
   useEffect(() => {
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.onended = () => setIsPlaying(false);
-    }
-  }, []);
+    const initializeRecorder = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder.current = new MediaRecorder(stream);
 
-  useEffect(() => {
-    return () => {
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
+        mediaRecorder.current.ondataavailable = (event) => {
+          audioChunks.current.push(event.data);
+        };
+
+        mediaRecorder.current.onstop = () => {
+          const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
+          const url = URL.createObjectURL(audioBlob);
+          setAudioURL(url);
+          audioChunks.current = []; // Clear chunks for next recording
+        };
+      } catch (error) {
+        console.error("Error initializing media recorder:", error);
+        toast({
+          title: "Error",
+          description: "Failed to initialize audio recording. Please check your microphone permissions.",
+          variant: "destructive",
+        });
       }
     };
-  }, [audioUrl]);
+
+    initializeRecorder();
+
+    return () => {
+      if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
+        mediaRecorder.current.stop();
+      }
+    };
+  }, [toast]);
+
+  const startRecording = () => {
+    if (mediaRecorder.current && mediaRecorder.current.state === 'inactive') {
+      audioChunks.current = []; // Ensure previous chunks are cleared
+      mediaRecorder.current.start();
+      setIsRecording(true);
+      toast({
+        title: "Recording...",
+        description: "Your audio is being recorded.",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
+      mediaRecorder.current.stop();
+      setIsRecording(false);
+      toast({
+        title: "Recording stopped",
+        description: "Processing your audio...",
+      });
+    }
+  };
+
+  const uploadAudio = async (audioFile: File) => {
+    const formData = new FormData();
+    formData.append("audio", audioFile);
+
+    try {
+      const response = await fetch("http://localhost:8000/analyze", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setTranscription(result.transcription);
+      setAnalysis(result.analysis);
+      toast({
+        title: "Analysis Complete",
+        description: "Results are ready to view.",
+      });
+    } catch (error: any) {
+      console.error("Upload error:", error);
+      toast({
+        title: "Upload Failed",
+        description: error.message || "Failed to upload and analyze audio.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await uploadAudio(file);
+    }
+  };
+
+  const handleRecordingUpload = async () => {
+    if (audioURL) {
+      try {
+        const response = await fetch(audioURL);
+        const blob = await response.blob();
+        const audioFile = new File([blob], "recording.wav", { type: "audio/wav" });
+        await uploadAudio(audioFile);
+      } catch (error) {
+        console.error("Error uploading recording:", error);
+        toast({
+          title: "Upload Failed",
+          description: "Failed to upload the recording.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      toast({
+        title: "No Recording Found",
+        description: "Please make a recording first.",
+        variant: "warning",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
       {/* Navigation Bar */}
-      <nav className="px-6 py-4 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-12">
-            <div className="text-2xl font-bold text-white">RethorAI</div>
-            <div className="hidden md:flex items-center gap-6">
-              <Link to="/">
-                <Button variant="ghost" className="text-white/70 hover:text-white">
-                  <Home className="h-4 w-4 mr-2" />
-                  Home
-                </Button>
-              </Link>
-              <Link to="/speaking-coach">
-                <Button variant="ghost" className="text-white/70 hover:text-white">
-                  <Mic className="h-4 w-4 mr-2" />
-                  Speaking Coach
-                </Button>
-              </Link>
-              <Link to="/speech-summary">
-                <Button variant="ghost" className="text-white/70 hover:text-white">
-                  <AudioWaveform className="h-4 w-4 mr-2" />
-                  Speech Summary
-                </Button>
-              </Link>
-              <Button variant="ghost" className="text-white/70 hover:text-white">
-                <HelpCircle className="h-4 w-4 mr-2" />
-                FAQ
-              </Button>
-            </div>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <Button variant="ghost" className="text-white/70 hover:text-white">
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Button>
           </div>
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="rounded-full p-2 hover:bg-white/10"
-              onClick={() => toast({ title: "Profile", description: "Profile functionality coming soon!" })}
-            >
+          <div className="space-x-2">
+            <Button variant="ghost" className="rounded-full p-2 hover:bg-white/10">
+              <HelpCircle className="h-6 w-6 text-white/70" />
+            </Button>
+            <Button variant="ghost" className="rounded-full p-2 hover:bg-white/10" onClick={() => toast({ title: "Profile", description: "Profile functionality coming soon!" })}>
               <UserRound className="h-6 w-6 text-white/70" />
             </Button>
           </div>
         </div>
-      </nav>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from 0% from-white/90 via-white to-white/50 tracking-tight mb-6">
-            Your Rhetoric, Enhanced
-          </h1>
-          <p className="text-xl text-white/70">
-            Dive into speech analysis, where innovative AI technology meets debate expertise
-          </p>
-        </div>
-
-        <div className="max-w-2xl mx-auto mb-16">
-          <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8">
-            <div className="flex flex-col items-center gap-6">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileUpload}
-                accept="audio/*"
-                className="hidden"
-              />
-              <Button
-                onClick={handleUploadClick}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-300 py-6 text-lg flex items-center gap-3 font-medium tracking-wide rounded-xl"
-              >
-                <Upload size={24} />
-                Upload Audio File
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
+          {/* Title and Upload Section */}
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Unleash Your Speaking Potential
+            </h1>
+            <p className="text-lg text-white/70 mb-8">
+              Get instant feedback on your speeches and presentations.
+            </p>
+            <div className="space-x-4">
+              <Button asChild>
+                <label htmlFor="upload-input" className="cursor-pointer">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Audio
+                  <input id="upload-input" type="file" accept="audio/*" className="hidden" onChange={handleFileChange} />
+                </label>
               </Button>
-              {audioUrl && (
-                <div className="flex flex-col items-center gap-2 w-full">
-                  <audio ref={audioPlayerRef} src={audioUrl} />
-                  <Button
-                    onClick={togglePlayback}
-                    variant="outline"
-                    className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
-                  >
-                    {isPlaying ? (
-                      <>
-                        <StopCircle size={20} />
-                        Stop Playback
-                      </>
-                    ) : (
-                      <>
-                        <PlayCircle size={20} />
-                        Play Recording
-                      </>
-                    )}
-                  </Button>
-                </div>
+              {isRecording ? (
+                <Button variant="destructive" onClick={stopRecording}>
+                  <StopCircle className="h-4 w-4 mr-2 animate-pulse" />
+                  Stop Recording
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={startRecording}>
+                  <Mic className="h-4 w-4 mr-2" />
+                  Start Recording
+                </Button>
               )}
+              {audioURL && (
+                <Button onClick={handleRecordingUpload}>
+                  <AudioWaveform className="h-4 w-4 mr-2" />
+                  Upload Recording
+                </Button>
+              )}
+              <Link to="/speech-summary">
+                <Button>
+                  View Example <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
             </div>
           </div>
-        </div>
 
-        {/* Example Dashboard */}
-        <div className="max-w-2xl mx-auto mb-16">
-          <DebateScoreCard />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <AnalysisCard title="Speech Analysis">
-            <div className="space-y-3 text-white/70">
-              <p className="text-lg">Upload your audio to analyze your debate performance.</p>
-              <p>We'll help you identify:</p>
-              <ul className="list-disc list-inside space-y-2">
-                <li>Logical fallacies</li>
-                <li>Emotional responses</li>
-                <li>Argument structure</li>
-                <li>Voice confidence</li>
+          {/* Example Dashboard */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto mb-16">
+            <div className="h-full">
+              <DebateScoreCard />
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-3">Key Insights</h3>
+              <ul className="space-y-2 text-white/70">
+                <li>• Strong evidence presentation and logical flow</li>
+                <li>• Excellent time management throughout</li>
+                <li>• Room for improvement in rebuttal techniques</li>
+                <li>• Consistent speaking clarity and pace</li>
               </ul>
             </div>
-          </AnalysisCard>
-
-          <AnalysisCard title="Improvement Tips">
-            <div className="space-y-3 text-white/70">
-              <p className="text-lg">Your personalized coaching will include:</p>
-              <ul className="list-disc list-inside space-y-2">
-                <li>Rhetoric enhancement suggestions</li>
-                <li>Stress management techniques</li>
-                <li>Structure improvements</li>
-                <li>Practice exercises</li>
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-3">Recommendations</h3>
+              <ul className="space-y-2 text-white/70">
+                <li>• Practice anticipating counter-arguments</li>
+                <li>• Focus on strengthening rebuttal responses</li>
+                <li>• Maintain current time management strategies</li>
+                <li>• Consider incorporating more varied evidence types</li>
               </ul>
             </div>
-          </AnalysisCard>
+          </div>
+
+          {/* Remove the existing analysis cards since we've moved their content up */}
         </div>
       </div>
     </div>
