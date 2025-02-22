@@ -65,16 +65,16 @@ const Index = () => {
   }, [audioUrl]);
 
   return (
-    <div className="min-h-screen w-full bg-[#1A1F2C] p-6">
+    <div className="min-h-screen w-full bg-black p-6">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#9b87f5] to-[#8B5CF6] bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] bg-clip-text text-transparent tracking-tight">
             RethorAI
           </h1>
-          <p className="text-white/70">Your AI-powered debate coach</p>
+          <p className="text-white/70 font-light tracking-wide">Your AI-powered debate coach</p>
         </div>
 
-        <div className="bg-[#221F26]/50 backdrop-blur-xl border border-[#9b87f5]/20 rounded-xl p-8 shadow-lg">
+        <div className="bg-black/30 rounded-xl p-8">
           <div className="flex flex-col items-center gap-6">
             <div className="w-full max-w-md">
               <div className="flex flex-col items-center gap-4">
@@ -87,7 +87,7 @@ const Index = () => {
                 />
                 <Button
                   onClick={handleUploadClick}
-                  className="w-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white transition-all duration-300 py-6 text-lg flex items-center gap-3"
+                  className="w-full bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] hover:from-[#ff6666] hover:to-[#ff1a1a] text-white transition-all duration-300 py-6 text-lg flex items-center gap-3 font-medium tracking-wide"
                 >
                   <Upload size={24} />
                   Upload Audio File
@@ -98,7 +98,7 @@ const Index = () => {
                     <Button
                       onClick={togglePlayback}
                       variant="outline"
-                      className="w-full bg-[#403E43] border-[#9b87f5]/20 hover:bg-[#4C4B50] text-white flex items-center gap-2"
+                      className="w-full bg-white/5 hover:bg-white/10 text-white flex items-center gap-2 font-medium tracking-wide"
                     >
                       {isPlaying ? (
                         <>
