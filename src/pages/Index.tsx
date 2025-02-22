@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { PlayCircle, StopCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import DebateScoreCard from "@/components/DebateScoreCard";
 
 const Index = () => {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -119,7 +120,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto mb-12">
           <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8">
             <div className="flex flex-col items-center gap-6">
               <input
@@ -158,6 +159,33 @@ const Index = () => {
                   </Button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Dashboard Section */}
+        <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
+          <div className="h-full">
+            <DebateScoreCard />
+          </div>
+          <div className="space-y-6">
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-3">Key Insights</h3>
+              <ul className="space-y-2 text-white/70">
+                <li>• Strong evidence presentation and logical flow</li>
+                <li>• Excellent time management throughout</li>
+                <li>• Room for improvement in rebuttal techniques</li>
+                <li>• Consistent speaking clarity and pace</li>
+              </ul>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+              <h3 className="text-xl font-semibold text-white mb-3">Recommendations</h3>
+              <ul className="space-y-2 text-white/70">
+                <li>• Practice anticipating counter-arguments</li>
+                <li>• Focus on strengthening rebuttal responses</li>
+                <li>• Maintain current time management strategies</li>
+                <li>• Consider incorporating more varied evidence types</li>
+              </ul>
             </div>
           </div>
         </div>
