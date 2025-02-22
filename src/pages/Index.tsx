@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -189,13 +188,12 @@ const Index = () => {
             <div className="flex flex-col items-center gap-6">
               <div className="w-full flex flex-col items-center gap-6">
                 <div className="flex items-center gap-4">
-                  <Button
+                  <button
                     onClick={handleUploadClick}
-                    className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-300 py-6 text-lg flex items-center gap-3 font-medium tracking-wide rounded-xl"
+                    className="relative p-6 rounded-full bg-white/10 hover:bg-theme-red/20 text-theme-red transition-all duration-300"
                   >
-                    <Upload size={24} />
-                    Upload Audio File
-                  </Button>
+                    <Upload size={32} className="relative z-10" />
+                  </button>
                   <div className="relative">
                     <RecordButton isRecording={isRecording} onClick={isRecording ? stopRecording : startRecording} />
                   </div>
