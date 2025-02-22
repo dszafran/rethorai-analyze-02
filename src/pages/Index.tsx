@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X } from "lucide-react";
+import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Play, Stop } from "lucide-react";
@@ -14,6 +14,7 @@ const Index = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
   const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -55,6 +56,48 @@ const Index = () => {
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const exportAudio = async () => {
+    if (!audioUrl) {
+      toast({
+        variant: "destructive",
+        title: "No audio to export",
+        description: "Please record or upload audio first",
+      });
+      return;
+    }
+
+    try {
+      setIsExporting(true);
+      const response = await fetch(audioUrl);
+      const blob = await response.blob();
+      
+      // Prepare FormData for the future API endpoint
+      const formData = new FormData();
+      formData.append('audio', blob, 'recording.webm');
+
+      // This is where you'll make the API call to your Python backend
+      // Example of how the API call would look:
+      // const response = await fetch('YOUR_PYTHON_BACKEND_URL/upload', {
+      //   method: 'POST',
+      //   body: formData,
+      // });
+
+      toast({
+        title: "Export ready",
+        description: "Frontend is prepared to send audio to backend",
+      });
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        variant: "destructive",
+        title: "Export failed",
+        description: "There was an error preparing the audio for export",
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const startRecording = async () => {
@@ -264,6 +307,15 @@ const Index = () => {
                   className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border-white/20 py-6"
                 >
                   <X className="w-6 h-6" />
+                </Button>
+                <Button
+                  onClick={exportAudio}
+                  variant="outline"
+                  size="lg"
+                  className="bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border-white/20 py-6"
+                  disabled={isExporting}
+                >
+                  <Share2 className="w-6 h-6" />
                 </Button>
               </div>
             </div>
