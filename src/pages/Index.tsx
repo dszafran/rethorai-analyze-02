@@ -174,7 +174,7 @@ const Index = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-24">
           <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from 0% from-white/90 via-white to-white/50 tracking-tight mb-6">
             Your Rhetoric, Enhanced
           </h1>
@@ -183,8 +183,8 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-12 flex flex-col items-center">
-          <div className="flex items-center gap-12 mb-8">
+        <div className="max-w-2xl mx-auto mb-24 flex flex-col items-center">
+          <div className="flex items-center gap-12 mb-12">
             <button
               onClick={handleUploadClick}
               className="p-2 text-white hover:text-white/70 transition-colors"
