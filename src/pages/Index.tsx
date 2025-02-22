@@ -85,10 +85,12 @@ const Index = () => {
                   Speaking Coach
                 </Button>
               </Link>
-              <Button variant="ghost" className="text-white/70 hover:text-white">
-                <AudioWaveform className="h-4 w-4 mr-2" />
-                Analyze Speech
-              </Button>
+              <Link to="/analysis">
+                <Button variant="ghost" className="text-white/70 hover:text-white">
+                  <AudioWaveform className="h-4 w-4 mr-2" />
+                  Analyze Speech
+                </Button>
+              </Link>
               <Button variant="ghost" className="text-white/70 hover:text-white">
                 <HelpCircle className="h-4 w-4 mr-2" />
                 FAQ
