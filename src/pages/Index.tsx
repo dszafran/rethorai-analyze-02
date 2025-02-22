@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight } from "lucide-react";
+import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { PlayCircle, StopCircle } from "lucide-react";
@@ -128,6 +128,18 @@ const Index = () => {
     };
   }, [audioUrl, mediaStream]);
 
+  const deleteRecording = () => {
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+      setIsPlaying(false);
+      toast({
+        title: "Recording deleted",
+        description: "Your recording has been removed",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
       {/* Navigation Bar */}
@@ -218,23 +230,32 @@ const Index = () => {
           {audioUrl && (
             <div className="flex flex-col items-center gap-2 w-full max-w-lg">
               <audio ref={audioPlayerRef} src={audioUrl} />
-              <Button
-                onClick={togglePlayback}
-                variant="outline"
-                className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
-              >
-                {isPlaying ? (
-                  <>
-                    <StopCircle size={20} />
-                    Stop Playback
-                  </>
-                ) : (
-                  <>
-                    <PlayCircle size={20} />
-                    Play Recording
-                  </>
-                )}
-              </Button>
+              <div className="flex gap-2 w-full">
+                <Button
+                  onClick={togglePlayback}
+                  variant="outline"
+                  className="flex-1 bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
+                >
+                  {isPlaying ? (
+                    <>
+                      <StopCircle size={20} />
+                      Stop Playback
+                    </>
+                  ) : (
+                    <>
+                      <PlayCircle size={20} />
+                      Play Recording
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={deleteRecording}
+                  variant="outline"
+                  className="bg-white/5 hover:bg-white/10 text-white border-white/20"
+                >
+                  <X size={20} />
+                </Button>
+              </div>
             </div>
           )}
         </div>
