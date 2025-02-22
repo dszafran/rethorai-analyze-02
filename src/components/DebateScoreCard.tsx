@@ -1,6 +1,4 @@
 
-import { CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 interface ScoreProps {
   category: string;
   score: number;
@@ -41,7 +39,7 @@ const DebateScoreCard = () => {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white">Latest Debate Performance</h2>
+        <h2 className="text-xl font-semibold text-white">Speech Performance</h2>
       </div>
       <div className="space-y-4">
         {scores.map((score, index) => (
