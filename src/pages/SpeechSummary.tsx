@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useRef, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
-const Analysis = () => {
+const SpeechSummary = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,7 +94,7 @@ const Analysis = () => {
           </Button>
         </div>
         
-        <h1 className="text-4xl font-bold text-white mb-6">Speech Analysis</h1>
+        <h1 className="text-4xl font-bold text-white mb-6">Speech Summary</h1>
         <div className="grid gap-6">
           <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
             <h2 className="text-2xl font-semibold text-white mb-4">Analyze Your Speech</h2>
@@ -136,4 +136,4 @@ const Analysis = () => {
   );
 };
 
-export default Analysis;
+export default SpeechSummary;
