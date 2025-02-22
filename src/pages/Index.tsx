@@ -390,7 +390,7 @@ const Index = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Download audio</p>
+                      <p>Download recording</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

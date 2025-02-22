@@ -13,7 +13,7 @@ const ScoreBar = ({ score, maxScore }: { score: number; maxScore: number }) => (
       className="h-full rounded-full transition-all duration-500"
       style={{ 
         width: `${(score / maxScore) * 100}%`,
-        background: `linear-gradient(90deg, rgba(255,255,255,${score/100}) 0%, rgba(255,255,255,${(score/100) * 0.3}) 100%)`
+        background: `linear-gradient(90deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,${score/100}) 100%)`
       }}
     />
   </div>
