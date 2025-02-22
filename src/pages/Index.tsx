@@ -238,24 +238,24 @@ const Index = () => {
             <div className="text-2xl font-bold text-white">RethorAI</div>
             <div className="hidden md:flex items-center gap-6">
               <Link to="/">
-                <Button variant="ghost" className="text-white/70 hover:text-white">
+                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
                   <Home className="h-4 w-4 mr-2" />
                   Home
                 </Button>
               </Link>
               <Link to="/speaking-coach">
-                <Button variant="ghost" className="text-white/70 hover:text-white">
+                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
                   <Mic className="h-4 w-4 mr-2" />
                   Speaking Coach
                 </Button>
               </Link>
               <Link to="/speech-summary">
-                <Button variant="ghost" className="text-white/70 hover:text-white">
+                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
                   <AudioWaveform className="h-4 w-4 mr-2" />
                   Speech Summary
                 </Button>
               </Link>
-              <Button variant="ghost" className="text-white/70 hover:text-white">
+              <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
                 <HelpCircle className="h-4 w-4 mr-2" />
                 FAQ
               </Button>
