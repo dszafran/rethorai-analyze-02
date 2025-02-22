@@ -65,22 +65,25 @@ const Index = () => {
   }, [audioUrl]);
 
   return (
-    <div className="min-h-screen w-full bg-black p-6">
+    <div className="min-h-screen w-full bg-black p-6 pt-12">
       <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex justify-between items-center mb-8">
-          <div className="text-center">
+        <div className="flex justify-between items-start mb-12">
+          <div className="flex-1" />
+          <div className="text-center flex-1">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] bg-clip-text text-transparent tracking-tight">
               RethorAI
             </h1>
             <p className="text-white/70 font-light tracking-wide">Your AI-powered debate coach</p>
           </div>
-          <Button
-            variant="ghost"
-            className="rounded-full p-2 hover:bg-white/10"
-            onClick={() => toast({ title: "Profile", description: "Profile functionality coming soon!" })}
-          >
-            <UserRound className="h-6 w-6 text-white/70" />
-          </Button>
+          <div className="flex-1 flex justify-end">
+            <Button
+              variant="ghost"
+              className="rounded-full p-2 hover:bg-white/10"
+              onClick={() => toast({ title: "Profile", description: "Profile functionality coming soon!" })}
+            >
+              <UserRound className="h-6 w-6 text-white/70" />
+            </Button>
+          </div>
         </div>
 
         <div className="bg-black/30 rounded-xl p-8">
