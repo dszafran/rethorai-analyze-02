@@ -17,7 +17,7 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
 
     const analyzer = audioContext.createAnalyser();
     analyzerRef.current = analyzer;
-    analyzer.fftSize = 256;
+    analyzer.fftSize = 128; // Reduced for crisper visualization
     
     const source = audioContext.createMediaStreamSource(mediaStream);
     source.connect(analyzer);
@@ -33,18 +33,67 @@ const VoiceVisualizer = ({ isRecording, audioContext, mediaStream }: VoiceVisual
       animationFrameRef.current = requestAnimationFrame(draw);
       analyzer.getByteFrequencyData(dataArray);
 
-      ctx.fillStyle = "rgb(0, 0, 0)";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       const barWidth = (canvas.width / bufferLength) * 2.5;
-      let x = 0;
-
+      let x = canvas.width / 2;
+      
+      // Draw bars in both directions from the center
       for (let i = 0; i < bufferLength; i++) {
-        const barHeight = (dataArray[i] / 255) * canvas.height;
-        ctx.fillStyle = `rgb(234, 56, 76)`;
-        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+        const barHeight = (dataArray[i] / 255) * (canvas.height / 2);
+        
+        // Create gradient for bars
+        const gradient = ctx.createLinearGradient(0, canvas.height / 2 - barHeight, 0, canvas.height / 2 + barHeight);
+        gradient.addColorStop(0, "rgba(234, 56, 76, 0.8)");
+        gradient.addColorStop(1, "rgba(234, 56, 76, 0.4)");
+        
+        ctx.fillStyle = gradient;
+        
+        // Draw bar upward from center
+        ctx.fillRect(
+          x, 
+          canvas.height / 2 - barHeight, 
+          barWidth, 
+          barHeight
+        );
+        
+        // Draw bar downward from center (mirror)
+        ctx.fillRect(
+          x, 
+          canvas.height / 2, 
+          barWidth, 
+          barHeight
+        );
+        
+        // Draw bar on the left side (mirror)
+        ctx.fillRect(
+          canvas.width - x - barWidth, 
+          canvas.height / 2 - barHeight, 
+          barWidth, 
+          barHeight
+        );
+        
+        ctx.fillRect(
+          canvas.width - x - barWidth, 
+          canvas.height / 2, 
+          barWidth, 
+          barHeight
+        );
+        
         x += barWidth + 1;
       }
+      
+      // Add glow effect
+      ctx.globalCompositeOperation = "lighter";
+      ctx.filter = "blur(4px)";
+      ctx.globalAlpha = 0.1;
+      ctx.fillStyle = "rgba(234, 56, 76, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.filter = "none";
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
     };
 
     draw();
