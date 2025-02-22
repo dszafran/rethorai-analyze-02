@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound } from "lucide-react";
+import { Upload, UserRound, Home, Users, FileText, Settings, HelpCircle, Shield, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import AnalysisCard from "@/components/AnalysisCard";
 import { useToast } from "@/components/ui/use-toast";
@@ -65,17 +65,36 @@ const Index = () => {
   }, [audioUrl]);
 
   return (
-    <div className="min-h-screen w-full bg-black p-6 pt-12">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex justify-between items-start mb-12">
-          <div className="flex-1" />
-          <div className="text-center flex-1">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] bg-clip-text text-transparent tracking-tight">
-              RethorAI
-            </h1>
-            <p className="text-white/70 font-light tracking-wide">Your AI-powered debate coach</p>
+    <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
+      {/* Navigation Bar */}
+      <nav className="px-6 py-4 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-12">
+            <div className="text-2xl font-bold text-white">RethorAI</div>
+            <div className="hidden md:flex items-center gap-6">
+              <Button variant="ghost" className="text-white/70 hover:text-white">
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+              <Button variant="ghost" className="text-white/70 hover:text-white">
+                <FileText className="h-4 w-4 mr-2" />
+                Features
+              </Button>
+              <Button variant="ghost" className="text-white/70 hover:text-white">
+                <Users className="h-4 w-4 mr-2" />
+                Community
+              </Button>
+              <Button variant="ghost" className="text-white/70 hover:text-white">
+                <HelpCircle className="h-4 w-4 mr-2" />
+                FAQ
+              </Button>
+            </div>
           </div>
-          <div className="flex-1 flex justify-end">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" className="text-white/70 hover:text-white">
+              <Shield className="h-4 w-4 mr-2" />
+              Protection
+            </Button>
             <Button
               variant="ghost"
               className="rounded-full p-2 hover:bg-white/10"
@@ -85,58 +104,68 @@ const Index = () => {
             </Button>
           </div>
         </div>
+      </nav>
 
-        <div className="bg-black/30 rounded-xl p-8">
-          <div className="flex flex-col items-center gap-6">
-            <div className="w-full max-w-md">
-              <div className="flex flex-col items-center gap-4">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileUpload}
-                  accept="audio/*"
-                  className="hidden"
-                />
-                <Button
-                  onClick={handleUploadClick}
-                  className="w-full bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] hover:from-[#ff6666] hover:to-[#ff1a1a] text-white transition-all duration-300 py-6 text-lg flex items-center gap-3 font-medium tracking-wide"
-                >
-                  <Upload size={24} />
-                  Upload Audio File
-                </Button>
-                {audioUrl && (
-                  <div className="flex flex-col items-center gap-2 w-full">
-                    <audio ref={audioPlayerRef} src={audioUrl} />
-                    <Button
-                      onClick={togglePlayback}
-                      variant="outline"
-                      className="w-full bg-white/5 hover:bg-white/10 text-white flex items-center gap-2 font-medium tracking-wide"
-                    >
-                      {isPlaying ? (
-                        <>
-                          <StopCircle size={20} />
-                          Stop Playback
-                        </>
-                      ) : (
-                        <>
-                          <PlayCircle size={20} />
-                          Play Recording
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
-              </div>
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from 0% from-white/90 via-white to-white/50 tracking-tight mb-6">
+            Your Voice, Enhanced
+          </h1>
+          <p className="text-xl text-white/70">
+            Dive into speech analysis, where innovative AI technology meets debate expertise
+          </p>
+        </div>
+
+        <div className="max-w-2xl mx-auto mb-16">
+          <div className="bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 p-8">
+            <div className="flex flex-col items-center gap-6">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept="audio/*"
+                className="hidden"
+              />
+              <Button
+                onClick={handleUploadClick}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white transition-all duration-300 py-6 text-lg flex items-center gap-3 font-medium tracking-wide rounded-xl"
+              >
+                <Upload size={24} />
+                Upload Audio File
+              </Button>
+              {audioUrl && (
+                <div className="flex flex-col items-center gap-2 w-full">
+                  <audio ref={audioPlayerRef} src={audioUrl} />
+                  <Button
+                    onClick={togglePlayback}
+                    variant="outline"
+                    className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 flex items-center gap-2 font-medium tracking-wide"
+                  >
+                    {isPlaying ? (
+                      <>
+                        <StopCircle size={20} />
+                        Stop Playback
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle size={20} />
+                        Play Recording
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <AnalysisCard title="Speech Analysis">
-            <div className="space-y-2 text-white/70">
-              <p>Upload your audio to analyze your debate performance.</p>
+            <div className="space-y-3 text-white/70">
+              <p className="text-lg">Upload your audio to analyze your debate performance.</p>
               <p>We'll help you identify:</p>
-              <ul className="list-disc list-inside space-y-1">
+              <ul className="list-disc list-inside space-y-2">
                 <li>Logical fallacies</li>
                 <li>Emotional responses</li>
                 <li>Argument structure</li>
@@ -146,9 +175,9 @@ const Index = () => {
           </AnalysisCard>
 
           <AnalysisCard title="Improvement Tips">
-            <div className="space-y-2 text-white/70">
-              <p>Your personalized coaching will include:</p>
-              <ul className="list-disc list-inside space-y-1">
+            <div className="space-y-3 text-white/70">
+              <p className="text-lg">Your personalized coaching will include:</p>
+              <ul className="list-disc list-inside space-y-2">
                 <li>Rhetoric enhancement suggestions</li>
                 <li>Stress management techniques</li>
                 <li>Structure improvements</li>

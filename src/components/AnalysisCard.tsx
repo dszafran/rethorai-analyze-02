@@ -8,9 +8,9 @@ interface AnalysisCardProps {
 
 const AnalysisCard = ({ title, children }: AnalysisCardProps) => {
   return (
-    <Card className="bg-black/30 rounded-xl">
+    <Card className="bg-white/5 backdrop-blur-lg border-white/10 rounded-2xl">
       <CardHeader>
-        <CardTitle className="text-lg font-medium bg-gradient-to-r from-[#ff4d4d] to-[#ff0000] bg-clip-text text-transparent">{title}</CardTitle>
+        <CardTitle className="text-xl font-semibold text-white">{title}</CardTitle>
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>
