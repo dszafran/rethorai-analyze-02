@@ -1,12 +1,9 @@
 
-import { useState, useRef, useEffect } from "react";
-import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar, Download } from "lucide-react";
+import { useState, useRef } from "react";
+import { Upload, UserRound, Home, Mic, AudioWaveform, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "react-router-dom";
-import DebateScoreCard from "@/components/DebateScoreCard";
-import RecordButton from "@/components/RecordButton";
-import VoiceVisualizer from "@/components/VoiceVisualizer";
 import {
   Tooltip,
   TooltipContent,
@@ -17,100 +14,30 @@ import { AnalysisResult } from "@/types/analysis";
 import AnalysisSections from "@/components/AnalysisSections";
 
 const Index = () => {
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
-  const [isExporting, setIsExporting] = useState(false);
-  const [recordingFormat, setRecordingFormat] = useState<string>('audio/webm');
-  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
-  const { toast } = useToast();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { toast } = useToast();
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('audio/')) {
+    if (file.type !== 'audio/webm') {
       toast({
         variant: "destructive",
         title: "Invalid file type",
-        description: "Please upload an audio file",
-      });
-      return;
-    }
-
-    const url = URL.createObjectURL(file);
-    setAudioUrl(url);
-    toast({
-      title: "File uploaded",
-      description: "Your audio file is ready for analysis",
-    });
-  };
-
-  const togglePlayback = () => {
-    if (!audioPlayerRef.current || !audioUrl) return;
-
-    if (isPlaying) {
-      audioPlayerRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      audioPlayerRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const getSupportedMimeType = () => {
-    const types = [
-      'audio/mp3',
-      'audio/mpeg',
-      'audio/webm'
-    ];
-    
-    for (const type of types) {
-      if (MediaRecorder.isTypeSupported(type)) {
-        return type;
-      }
-    }
-    return 'audio/webm'; // Fallback format
-  };
-
-  const exportAudio = async () => {
-    if (!audioUrl) {
-      toast({
-        variant: "destructive",
-        title: "No audio to export",
-        description: "Please record or upload audio first",
+        description: "Please upload a WebM audio file",
       });
       return;
     }
 
     try {
-      setIsExporting(true);
-      
-      // Get the raw webm data
-      const response = await fetch(audioUrl);
-      const audioBlob = await response.blob();
-      
-      // Keep the original blob if it's already webm, otherwise convert
-      const webmBlob = audioBlob.type.includes('webm') 
-        ? audioBlob 
-        : new Blob([audioBlob], { type: 'audio/webm;codecs=opus' });
-
+      setIsAnalyzing(true);
       const formData = new FormData();
-      formData.append('file', webmBlob, 'recording.webm');
+      formData.append('file', file);
 
-      console.log('Sending audio file:', webmBlob.type, webmBlob.size);
-
-      const analysisResponse = await fetch('https://frequent-nat-agme-5eaaebcf.koyeb.app/audio', {
+      const response = await fetch('https://frequent-nat-agme-5eaaebcf.koyeb.app/audio', {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -119,138 +46,31 @@ const Index = () => {
         body: formData,
       });
 
-      if (!analysisResponse.ok) {
-        const errorText = await analysisResponse.text();
-        console.error('Server response:', errorText);
-        throw new Error(`Analysis failed: ${errorText}`);
+      if (!response.ok) {
+        throw new Error('Analysis failed');
       }
 
-      const analysisData = await analysisResponse.json();
-      setAnalysisData(analysisData);
+      const data = await response.json();
+      setAnalysisData(data);
       
       toast({
         title: "Analysis complete",
         description: "Your audio has been analyzed successfully",
       });
-
-      console.log('Analysis response:', analysisData);
-      
     } catch (error) {
-      console.error('Export/Analysis error:', error);
+      console.error('Analysis error:', error);
       toast({
         variant: "destructive",
         title: "Analysis failed",
-        description: error instanceof Error ? error.message : "There was an error analyzing the audio",
+        description: "There was an error analyzing your audio file",
       });
     } finally {
-      setIsExporting(false);
+      setIsAnalyzing(false);
     }
   };
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const audioCtx = new AudioContext();
-      setAudioContext(audioCtx);
-      setMediaStream(stream);
-
-      const mimeType = getSupportedMimeType();
-      setRecordingFormat(mimeType);
-      console.log('Recording using format:', mimeType);
-
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: mimeType
-      });
-      
-      mediaRecorderRef.current = mediaRecorder;
-      chunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          chunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        setAudioUrl(url);
-        setMediaStream(null);
-        toast({
-          title: "Recording completed",
-          description: `Recording saved in ${mimeType.includes('mp3') || mimeType.includes('mpeg') ? 'MP3' : 'WebM'} format`,
-        });
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-      toast({
-        title: "Recording started",
-        description: "Speak clearly into your microphone",
-      });
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not access microphone. Please check permissions.",
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (audioPlayerRef.current) {
-      audioPlayerRef.current.onended = () => setIsPlaying(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
-      if (mediaStream) {
-        mediaStream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [audioUrl, mediaStream]);
-
-  const deleteRecording = () => {
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-      setAudioUrl(null);
-      setIsPlaying(false);
-      toast({
-        title: "Recording deleted",
-        description: "Your recording has been removed",
-      });
-    }
-  };
-
-  const handleDownload = () => {
-    if (!audioUrl) return;
-    
-    const link = document.createElement('a');
-    link.href = audioUrl;
-    link.download = `recording.${recordingFormat.includes('mp3') || recordingFormat.includes('mpeg') ? 'mp3' : 'webm'}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast({
-      title: "Download started",
-      description: "Your audio file is being downloaded",
-    });
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -300,199 +120,49 @@ const Index = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
         <div className="text-center max-w-3xl mx-auto mb-36">
-          <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from 0% from-white/90 via-white to-white/50 tracking-tight mb-6">
+          <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white/90 via-white to-white/50 tracking-tight mb-6">
             Your Rhetoric, Enhanced
           </h1>
           <p className="text-xl text-white/70">
-            Dive into speech analysis, where innovative AI technology meets debate expertise
+            Upload your WebM audio file for instant speech analysis
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-24 flex flex-col items-center">
-          <div className="flex flex-col items-center gap-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col items-center gap-8 mb-12">
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              accept="audio/webm"
+              className="hidden"
+            />
+            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button
-                    onClick={isRecording ? stopRecording : startRecording}
-                    className="p-6 text-white/70 hover:text-white transition-colors bg-white/5 hover:bg-white/10 rounded-full"
+                  <Button 
+                    onClick={handleUploadClick}
+                    className="bg-white/10 hover:bg-white/20 text-white p-8 rounded-full"
+                    disabled={isAnalyzing}
                   >
-                    <Mic size={64} />
-                  </button>
+                    <Upload className="w-8 h-8" />
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Record</p>
+                  <p>Upload WebM audio</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </div>
 
-          {isRecording && (
-            <div className="w-full max-w-lg mt-6">
-              <VoiceVisualizer
-                isRecording={isRecording}
-                audioContext={audioContext}
-                mediaStream={mediaStream}
-              />
-            </div>
-          )}
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept="audio/*"
-            className="hidden"
-          />
-          
-          {audioUrl && (
-            <div className="flex flex-col items-center gap-4 w-full max-w-lg mt-6">
-              <audio ref={audioPlayerRef} src={audioUrl} />
-              <div className="bg-white/5 backdrop-blur-sm rounded-lg p-2 flex gap-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={togglePlayback}
-                        variant="ghost"
-                        size="icon"
-                        className="text-white/70 hover:text-white hover:bg-white/10"
-                      >
-                        {isPlaying ? <Square className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{isPlaying ? 'Stop' : 'Play'} audio</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={deleteRecording}
-                        variant="ghost"
-                        size="icon"
-                        className="text-white/70 hover:text-white hover:bg-white/10"
-                      >
-                        <X className="w-5 h-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Delete audio</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={exportAudio}
-                        variant="ghost"
-                        size="icon"
-                        className="text-white/70 hover:text-white hover:bg-white/10"
-                        disabled={isExporting}
-                      >
-                        <ChartBar className="w-5 h-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Analyse</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={handleDownload}
-                        variant="ghost"
-                        size="icon"
-                        className="text-white/70 hover:text-white hover:bg-white/10"
-                      >
-                        <Download className="w-5 h-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Download recording</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={handleUploadClick}
-                        variant="ghost"
-                        size="icon"
-                        className="text-white/70 hover:text-white hover:bg-white/10"
-                      >
-                        <Upload className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Upload audio</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
-          )}
-
-          {!audioUrl && (
-            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-2 flex gap-2 mt-6">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      onClick={handleUploadClick}
-                      variant="ghost"
-                      size="icon"
-                      className="text-white/70 hover:text-white hover:bg-white/10"
-                    >
-                      <Upload className="w-4 h-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Upload audio</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          )}
-        </div>
-
-        {/* Dashboard Section */}
-        <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-          <div className="h-full max-w-sm">
-            <DebateScoreCard />
-          </div>
-          <div className="space-y-6">
-            {analysisData ? (
-              <AnalysisSections data={analysisData} />
-            ) : (
-              <>
-                <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-                  <h3 className="text-xl font-semibold text-white mb-3">Key Insights</h3>
-                  <ul className="space-y-2 text-white/70">
-                    <li>• Strong evidence presentation and logical flow</li>
-                    <li>• Excellent time management throughout</li>
-                    <li>• Room for improvement in rebuttal techniques</li>
-                    <li>• Consistent speaking clarity and pace</li>
-                  </ul>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
-                  <h3 className="text-xl font-semibold text-white mb-3">Recommendations</h3>
-                  <ul className="space-y-2 text-white/70">
-                    <li>• Practice anticipating counter-arguments</li>
-                    <li>• Focus on strengthening rebuttal responses</li>
-                    <li>• Maintain current time management strategies</li>
-                    <li>• Consider incorporating more varied evidence types</li>
-                  </ul>
-                </div>
-              </>
+            {isAnalyzing && (
+              <p className="text-white/70">Analyzing your audio...</p>
             )}
           </div>
+
+          {analysisData && (
+            <AnalysisSections data={analysisData} />
+          )}
         </div>
       </div>
     </div>
