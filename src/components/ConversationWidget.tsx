@@ -11,9 +11,8 @@ const ConversationWidget = () => {
 
   const handleStartConversation = async () => {
     try {
-      // Replace with your actual agent ID from ElevenLabs
       await conversation.startSession({
-        agentId: "replace_with_your_agent_id"
+        agentId: "lmfUCktvNNNtqsQUg0ao"  // Using your provided agent ID
       });
       setIsConnected(true);
     } catch (error) {
