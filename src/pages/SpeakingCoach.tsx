@@ -24,8 +24,7 @@ const SpeakingCoach = () => {
     script.src = "https://elevenlabs.io/convai-widget/index.js";
     script.async = true;
     script.type = "text/javascript";
-    document.body.appendChild(script);
-
+    
     // Configure widget to remove telephone icon
     const style = document.createElement('style');
     style.textContent = `
@@ -33,12 +32,20 @@ const SpeakingCoach = () => {
         display: none !important;
       }
     `;
+    
+    // Add elements to the document
     document.head.appendChild(style);
+    document.body.appendChild(script);
 
+    // Cleanup function
     return () => {
-      // Cleanup script and style when component unmounts
-      document.body.removeChild(script);
-      document.head.removeChild(style);
+      // Only remove elements if they still exist in the document
+      if (script && script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+      if (style && style.parentNode) {
+        style.parentNode.removeChild(style);
+      }
     };
   }, []);
 
