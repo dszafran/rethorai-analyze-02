@@ -1,8 +1,9 @@
 
 import { useState, useRef } from "react";
-import { Upload, UserRound } from "lucide-react";
+import { Upload, UserRound, ArrowLeft, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 import {
   Tooltip,
   TooltipContent,
@@ -14,27 +15,66 @@ import AnalysisSections from "@/components/AnalysisSections";
 
 const Index = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
+  const [recordingError, setRecordingError] = useState<string | null>(null);
   const [analysisData, setAnalysisData] = useState<AnalysisResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
 
-    console.log("File type:", file.type);
-    console.log("File name:", file.name);
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data);
+        }
+      };
 
-    // Ensure the file has .webm extension as required by the server
-    if (!file.name.endsWith(".webm")) {
+      recorder.onstop = async () => {
+        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const file = new File([blob], "recording.webm", { type: 'audio/webm' });
+        await handleFileAnalysis(file);
+      };
+
+      setMediaRecorder(recorder);
+      setAudioChunks([]);
+      recorder.start();
+      setIsRecording(true);
+      setRecordingError(null);
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      setRecordingError("Could not access microphone");
       toast({
         variant: "destructive",
-        title: "Invalid file type",
-        description: "Please upload a file with .webm extension.",
+        title: "Recording Error",
+        description: "Could not access microphone. Please check permissions.",
       });
-      return;
     }
+  };
 
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
+    }
+  };
+
+  const handleRecordClick = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  const handleFileAnalysis = async (file: File) => {
     try {
       setIsAnalyzing(true);
       const formData = new FormData();
@@ -54,7 +94,6 @@ const Index = () => {
         console.error("Server response status:", response.status);
         console.error("Server error details:", errorText);
         
-        // Show more specific error messages based on response status
         let errorMessage = "There was an error analyzing your audio file";
         if (response.status === 413) {
           errorMessage = "File size too large";
@@ -89,6 +128,25 @@ const Index = () => {
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    console.log("File type:", file.type);
+    console.log("File name:", file.name);
+
+    if (!file.name.endsWith(".webm")) {
+      toast({
+        variant: "destructive",
+        title: "Invalid file type",
+        description: "Please upload a file with .webm extension.",
+      });
+      return;
+    }
+
+    await handleFileAnalysis(file);
+  };
+
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
@@ -98,7 +156,17 @@ const Index = () => {
       <nav className="px-6 py-4 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-12">
-            <div className="text-2xl font-bold text-white">RhetorAI</div>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full hover:bg-white/10"
+                onClick={() => navigate(-1)}
+              >
+                <ArrowLeft className="h-6 w-6 text-white/70" />
+              </Button>
+              <div className="text-2xl font-bold text-white">RhetorAI</div>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <Button 
@@ -129,23 +197,43 @@ const Index = () => {
               accept=".webm" 
               className="hidden" 
             />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    onClick={handleUploadClick} 
-                    className="bg-white/10 hover:bg-white/20 text-white p-8 rounded-full" 
-                    disabled={isAnalyzing}
-                  >
-                    <Upload className="w-8 h-8" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Upload WebM audio</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="flex gap-4">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={handleRecordClick} 
+                      className={`bg-white/10 hover:bg-white/20 text-white p-8 rounded-full ${isRecording ? 'animate-pulse bg-red-500/20' : ''}`}
+                      disabled={isAnalyzing}
+                    >
+                      <Mic className="w-8 h-8" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{isRecording ? 'Stop Recording' : 'Start Recording'}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      onClick={handleUploadClick} 
+                      className="bg-white/10 hover:bg-white/20 text-white p-8 rounded-full" 
+                      disabled={isAnalyzing || isRecording}
+                    >
+                      <Upload className="w-8 h-8" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Upload WebM audio</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            {isRecording && <p className="text-white/70">Recording in progress...</p>}
             {isAnalyzing && <p className="text-white/70">Analyzing your audio...</p>}
+            {recordingError && <p className="text-red-500">{recordingError}</p>}
           </div>
           {analysisData && <AnalysisSections data={analysisData} />}
         </div>
