@@ -55,6 +55,7 @@ const Index = () => {
         mode: 'cors',
         headers: {
           'Accept': 'application/json',
+          // Remove Content-Type header - let the browser set it automatically with boundary
         },
         body: formData,
       });
