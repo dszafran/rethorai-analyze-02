@@ -5,6 +5,16 @@ import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useEffect } from "react";
 
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'elevenlabs-convai': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        'agent-id': string;
+      };
+    }
+  }
+}
+
 const SpeakingCoach = () => {
   const { toast } = useToast();
 
@@ -16,9 +26,19 @@ const SpeakingCoach = () => {
     script.type = "text/javascript";
     document.body.appendChild(script);
 
+    // Configure widget to remove telephone icon
+    const style = document.createElement('style');
+    style.textContent = `
+      .convai-widget .convai-call-button {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
     return () => {
-      // Cleanup script when component unmounts
+      // Cleanup script and style when component unmounts
       document.body.removeChild(script);
+      document.head.removeChild(style);
     };
   }, []);
 
