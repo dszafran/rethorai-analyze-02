@@ -3,10 +3,24 @@ import { ArrowLeft, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import ConversationWidget from "@/components/ConversationWidget";
+import { useEffect } from "react";
 
 const SpeakingCoach = () => {
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Add the ElevenLabs script
+    const script = document.createElement('script');
+    script.src = "https://elevenlabs.io/convai-widget/index.js";
+    script.async = true;
+    script.type = "text/javascript";
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup script when component unmounts
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
@@ -41,7 +55,9 @@ const SpeakingCoach = () => {
               <li>Progress tracking and analytics</li>
             </ul>
           </div>
-          <ConversationWidget />
+          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6 border border-white/10">
+            <elevenlabs-convai agent-id="lmfUCktvNNNtqsQUg0ao"></elevenlabs-convai>
+          </div>
         </div>
       </div>
     </div>
