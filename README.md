@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/81a66b30-3d4f-424f-bc90-e0d925d01fc6
+**URL**: https://rethorai-analyze-02.lovable.app/
 
 ## How can I edit this code?
 
