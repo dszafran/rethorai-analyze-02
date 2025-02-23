@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -109,7 +110,7 @@ const Index = () => {
 
       console.log('Sending audio file:', webmBlob.type, webmBlob.size);
 
-      const analysisResponse = await fetch('https://extreme-carmelita-agme-1cef64c5.koyeb.app/audio', {
+      const analysisResponse = await fetch('https://frequent-nat-agme-5eaaebcf.koyeb.app/audio', {
         method: 'POST',
         mode: 'cors',
         headers: {
