@@ -91,12 +91,20 @@ const Index = () => {
 
     try {
       setIsExporting(true);
-      const response = await fetch(audioUrl);
-      const blob = await response.blob();
       
+      // Get the raw webm data
+      const response = await fetch(audioUrl);
+      const audioBlob = await response.blob();
+      
+      // Ensure we're sending a webm file
+      const webmBlob = audioBlob.type === 'audio/webm' 
+        ? audioBlob 
+        : new Blob([audioBlob], { type: 'audio/webm' });
+
       const formData = new FormData();
-      const extension = recordingFormat.includes('mp3') || recordingFormat.includes('mpeg') ? 'mp3' : 'webm';
-      formData.append('audio', blob, `recording.${extension}`);
+      formData.append('audio', webmBlob, 'recording.webm');
+
+      console.log('Sending audio file:', webmBlob.type, webmBlob.size);
 
       const analysisResponse = await fetch('https://electrical-evaleen-agme-869c9b31.koyeb.app/audio', {
         method: 'POST',
@@ -104,7 +112,9 @@ const Index = () => {
       });
 
       if (!analysisResponse.ok) {
-        throw new Error('Analysis failed');
+        const errorText = await analysisResponse.text();
+        console.error('Server response:', errorText);
+        throw new Error(`Analysis failed: ${errorText}`);
       }
 
       const analysisData = await analysisResponse.json();
