@@ -91,20 +91,21 @@ const Index = () => {
 
     try {
       setIsExporting(true);
-      
-      // Get the raw webm data
-      const response = await fetch(audioUrl);
-      const audioBlob = await response.blob();
-      
-      // Keep the original blob if it's already webm, otherwise convert
-      const webmBlob = audioBlob.type.includes('webm') 
-        ? audioBlob 
-        : new Blob([audioBlob], { type: 'audio/webm;codecs=opus' });
+
+      // Get the raw audio data from chunksRef if it exists (for recordings)
+      let audioBlob;
+      if (chunksRef.current.length > 0) {
+        audioBlob = new Blob(chunksRef.current, { type: recordingFormat });
+      } else {
+        // For uploaded files, fetch the blob
+        const response = await fetch(audioUrl);
+        audioBlob = await response.blob();
+      }
 
       const formData = new FormData();
-      formData.append('file', webmBlob, 'recording.webm');
+      formData.append('file', audioBlob, 'recording.webm');
 
-      console.log('Sending audio file:', webmBlob.type, webmBlob.size);
+      console.log('Sending audio file:', audioBlob.type, audioBlob.size);
 
       const analysisResponse = await fetch('https://extreme-carmelita-agme-1cef64c5.koyeb.app/audio', {
         method: 'POST',
