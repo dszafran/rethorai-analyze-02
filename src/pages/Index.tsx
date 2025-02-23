@@ -96,13 +96,13 @@ const Index = () => {
       const response = await fetch(audioUrl);
       const audioBlob = await response.blob();
       
-      // Ensure we're sending a webm file
-      const webmBlob = audioBlob.type === 'audio/webm' 
-        ? audioBlob 
-        : new Blob([audioBlob], { type: 'audio/webm' });
+      // Ensure we're sending a webm file with correct mime type
+      const webmBlob = new Blob([audioBlob], { 
+        type: 'audio/webm;codecs=opus' 
+      });
 
       const formData = new FormData();
-      formData.append('audio', webmBlob, 'recording.webm');
+      formData.append('file', webmBlob, 'recording.webm'); // Changed from 'audio' to 'file'
 
       console.log('Sending audio file:', webmBlob.type, webmBlob.size);
 
