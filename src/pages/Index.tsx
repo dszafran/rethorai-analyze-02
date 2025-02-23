@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from "react";
 import { Upload, UserRound, Home, FileText, Mic, AudioWaveform, HelpCircle, ArrowRight, X, Square, Play, ChartBar, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -95,28 +94,34 @@ const Index = () => {
       const response = await fetch(audioUrl);
       const blob = await response.blob();
       
-      // Prepare FormData with the correct extension based on format
       const formData = new FormData();
       const extension = recordingFormat.includes('mp3') || recordingFormat.includes('mpeg') ? 'mp3' : 'webm';
       formData.append('audio', blob, `recording.${extension}`);
 
-      // This is where you'll make the API call to your Python backend
-      // Example of how the API call would look:
-      // const response = await fetch('YOUR_PYTHON_BACKEND_URL/upload', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
-
-      toast({
-        title: "Export ready",
-        description: `Audio ready to send (${extension} format)`,
+      const analysisResponse = await fetch('https://electrical-evaleen-agme-869c9b31.koyeb.app/audio', {
+        method: 'POST',
+        body: formData,
       });
+
+      if (!analysisResponse.ok) {
+        throw new Error('Analysis failed');
+      }
+
+      const analysisData = await analysisResponse.json();
+      
+      toast({
+        title: "Analysis complete",
+        description: "Your audio has been analyzed successfully",
+      });
+
+      console.log('Analysis response:', analysisData);
+      
     } catch (error) {
-      console.error('Export error:', error);
+      console.error('Export/Analysis error:', error);
       toast({
         variant: "destructive",
-        title: "Export failed",
-        description: "There was an error preparing the audio",
+        title: "Analysis failed",
+        description: "There was an error analyzing the audio",
       });
     } finally {
       setIsExporting(false);
