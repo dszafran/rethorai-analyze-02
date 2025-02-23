@@ -40,7 +40,7 @@ const Index = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("https://frequent-nat-agme-5eaaebcf.koyeb.app/audio", {
+      const response = await fetch("https://awake-elwira-agme-77ae3679.koyeb.app/audio", {
         method: "POST",
         mode: "cors",
         headers: {
