@@ -1,9 +1,8 @@
 
 import { useState, useRef } from "react";
-import { Upload, UserRound, Home, Mic, AudioWaveform, HelpCircle } from "lucide-react";
+import { Upload, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Link } from "react-router-dom";
 import {
   Tooltip,
   TooltipContent,
@@ -23,24 +22,16 @@ const Index = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Log the file type for debugging
-    console.log('File type:', file.type);
-    console.log('File name:', file.name);
+    console.log("File type:", file.type);
+    console.log("File name:", file.name);
 
-    // Accept various WebM MIME types
-    const validWebMTypes = [
-      'audio/webm',
-      'audio/webm;codecs=opus',
-      'audio/webm;codecs=vorbis',
-      'video/webm',
-      'video/webm;codecs=opus'
-    ];
+    const validWebMTypes = ["audio/webm", "audio/webm;codecs=opus", "audio/webm;codecs=vorbis", "video/webm", "video/webm;codecs=opus"];
 
-    if (!validWebMTypes.includes(file.type) && !file.name.endsWith('.webm')) {
+    if (!validWebMTypes.includes(file.type) && !file.name.endsWith(".webm")) {
       toast({
         variant: "destructive",
         title: "Invalid file type",
-        description: "Please upload a WebM audio file. The file must have a .webm extension.",
+        description: "Please upload a WebM audio file.",
       });
       return;
     }
@@ -48,33 +39,28 @@ const Index = () => {
     try {
       setIsAnalyzing(true);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const response = await fetch('https://frequent-nat-agme-5eaaebcf.koyeb.app/audio', {
-        method: 'POST',
-        mode: 'cors',
+      const response = await fetch("https://frequent-nat-agme-5eaaebcf.koyeb.app/audio", {
+        method: "POST",
+        mode: "cors",
         headers: {
-          'Accept': 'application/json',
-          // Remove Content-Type header - let the browser set it automatically with boundary
+          "Accept": "application/json",
         },
         body: formData,
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Server response:', errorText);
-        throw new Error('Analysis failed');
+        console.error("Server response:", errorText);
+        throw new Error("Analysis failed");
       }
 
       const data = await response.json();
       setAnalysisData(data);
-      
-      toast({
-        title: "Analysis complete",
-        description: "Your audio has been analyzed successfully",
-      });
+      toast({ title: "Analysis complete", description: "Your audio has been analyzed successfully" });
     } catch (error) {
-      console.error('Analysis error:', error);
+      console.error("Analysis error:", error);
       toast({
         variant: "destructive",
         title: "Analysis failed",
@@ -91,40 +77,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-black via-black/95 to-slate-900/20">
-      {/* Navigation Bar */}
       <nav className="px-6 py-4 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-12">
             <div className="text-2xl font-bold text-white">RhetorAI</div>
-            <div className="hidden md:flex items-center gap-6">
-              <Link to="/">
-                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
-                  <Home className="h-4 w-4 mr-2" />
-                  Home
-                </Button>
-              </Link>
-              <Link to="/speaking-coach">
-                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
-                  <Mic className="h-4 w-4 mr-2" />
-                  Speaking Coach
-                </Button>
-              </Link>
-              <Link to="/speech-summary">
-                <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
-                  <AudioWaveform className="h-4 w-4 mr-2" />
-                  Speech Summary
-                </Button>
-              </Link>
-              <Button variant="ghost" className="text-white/70 hover:text-white hover:bg-white/10">
-                <HelpCircle className="h-4 w-4 mr-2" />
-                FAQ
-              </Button>
-            </div>
           </div>
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              className="rounded-full p-2 hover:bg-white/10"
+            <Button 
+              variant="ghost" 
+              className="rounded-full p-2 hover:bg-white/10" 
               onClick={() => toast({ title: "Profile", description: "Profile functionality coming soon!" })}
             >
               <UserRound className="h-6 w-6 text-white/70" />
@@ -133,33 +94,29 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
         <div className="text-center max-w-3xl mx-auto mb-36">
           <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white/90 via-white to-white/50 tracking-tight mb-6">
             Your Rhetoric, Enhanced
           </h1>
-          <p className="text-xl text-white/70">
-            Upload your WebM audio file for instant speech analysis
-          </p>
+          <p className="text-xl text-white/70">Upload your WebM audio file for instant speech analysis</p>
         </div>
 
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col items-center gap-8 mb-12">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileUpload}
-              accept="audio/webm"
-              className="hidden"
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileUpload} 
+              accept="audio/webm" 
+              className="hidden" 
             />
-            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
-                    onClick={handleUploadClick}
-                    className="bg-white/10 hover:bg-white/20 text-white p-8 rounded-full"
+                    onClick={handleUploadClick} 
+                    className="bg-white/10 hover:bg-white/20 text-white p-8 rounded-full" 
                     disabled={isAnalyzing}
                   >
                     <Upload className="w-8 h-8" />
@@ -170,15 +127,9 @@ const Index = () => {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
-            {isAnalyzing && (
-              <p className="text-white/70">Analyzing your audio...</p>
-            )}
+            {isAnalyzing && <p className="text-white/70">Analyzing your audio...</p>}
           </div>
-
-          {analysisData && (
-            <AnalysisSections data={analysisData} />
-          )}
+          {analysisData && <AnalysisSections data={analysisData} />}
         </div>
       </div>
     </div>
