@@ -79,7 +79,7 @@ const Index = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("https://excessive-bernete-agme-5ef6f783.koyeb.app/audio", {
+      const response = await fetch("https://outside-abagail-agme-3605d15a.koyeb.app/audio", {
         method: "POST",
         mode: "cors",
         headers: {
