@@ -108,6 +108,10 @@ const Index = () => {
 
       const analysisResponse = await fetch('https://electrical-evaleen-agme-869c9b31.koyeb.app/audio', {
         method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Accept': 'application/json',
+        },
         body: formData,
       });
 
@@ -131,7 +135,7 @@ const Index = () => {
       toast({
         variant: "destructive",
         title: "Analysis failed",
-        description: "There was an error analyzing the audio",
+        description: error instanceof Error ? error.message : "There was an error analyzing the audio",
       });
     } finally {
       setIsExporting(false);
