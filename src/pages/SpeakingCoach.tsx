@@ -25,11 +25,19 @@ const SpeakingCoach = () => {
     script.async = true;
     script.type = "text/javascript";
     
-    // Configure widget to remove telephone icon
+    // Configure widget to remove telephone icon with a more specific selector
     const style = document.createElement('style');
     style.textContent = `
-      .convai-widget .convai-call-button {
+      .convai-widget [data-testid="call-button"],
+      .convai-widget .convai-call-button,
+      .convai-widget button[aria-label="Call"] {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        position: absolute !important;
+        pointer-events: none !important;
       }
     `;
     
