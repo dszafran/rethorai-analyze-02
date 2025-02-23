@@ -106,7 +106,7 @@ const Index = () => {
 
       console.log('Sending audio file:', webmBlob.type, webmBlob.size);
 
-      const analysisResponse = await fetch('https://electrical-evaleen-agme-869c9b31.koyeb.app/audio', {
+      const analysisResponse = await fetch('https://extreme-carmelita-agme-1cef64c5.koyeb.app/audio', {
         method: 'POST',
         mode: 'cors',
         headers: {
