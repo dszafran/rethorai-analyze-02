@@ -23,11 +23,24 @@ const Index = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.type !== 'audio/webm') {
+    // Log the file type for debugging
+    console.log('File type:', file.type);
+    console.log('File name:', file.name);
+
+    // Accept various WebM MIME types
+    const validWebMTypes = [
+      'audio/webm',
+      'audio/webm;codecs=opus',
+      'audio/webm;codecs=vorbis',
+      'video/webm',
+      'video/webm;codecs=opus'
+    ];
+
+    if (!validWebMTypes.includes(file.type) && !file.name.endsWith('.webm')) {
       toast({
         variant: "destructive",
         title: "Invalid file type",
-        description: "Please upload a WebM audio file",
+        description: "Please upload a WebM audio file. The file must have a .webm extension.",
       });
       return;
     }
@@ -47,6 +60,8 @@ const Index = () => {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
         throw new Error('Analysis failed');
       }
 
