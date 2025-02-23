@@ -25,13 +25,12 @@ const Index = () => {
     console.log("File type:", file.type);
     console.log("File name:", file.name);
 
-    const validWebMTypes = ["audio/webm", "audio/webm;codecs=opus", "audio/webm;codecs=vorbis", "video/webm", "video/webm;codecs=opus"];
-
-    if (!validWebMTypes.includes(file.type) && !file.name.endsWith(".webm")) {
+    // Ensure the file has .webm extension as required by the server
+    if (!file.name.endsWith(".webm")) {
       toast({
         variant: "destructive",
         title: "Invalid file type",
-        description: "Please upload a WebM audio file.",
+        description: "Please upload a file with .webm extension.",
       });
       return;
     }
@@ -52,19 +51,38 @@ const Index = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Server response:", errorText);
-        throw new Error("Analysis failed");
+        console.error("Server response status:", response.status);
+        console.error("Server error details:", errorText);
+        
+        // Show more specific error messages based on response status
+        let errorMessage = "There was an error analyzing your audio file";
+        if (response.status === 413) {
+          errorMessage = "File size too large";
+        } else if (response.status === 415) {
+          errorMessage = "Unsupported file type";
+        } else if (response.status === 500) {
+          errorMessage = `Server error: ${errorText}`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
+      if (!data.analysis || !data.score || !data.tips) {
+        throw new Error("Invalid response format from server");
+      }
+      
       setAnalysisData(data);
-      toast({ title: "Analysis complete", description: "Your audio has been analyzed successfully" });
+      toast({ 
+        title: "Analysis complete", 
+        description: "Your audio has been analyzed successfully" 
+      });
     } catch (error) {
       console.error("Analysis error:", error);
       toast({
         variant: "destructive",
         title: "Analysis failed",
-        description: "There was an error analyzing your audio file",
+        description: error instanceof Error ? error.message : "There was an error analyzing your audio file",
       });
     } finally {
       setIsAnalyzing(false);
@@ -108,7 +126,7 @@ const Index = () => {
               type="file" 
               ref={fileInputRef} 
               onChange={handleFileUpload} 
-              accept="audio/webm" 
+              accept=".webm" 
               className="hidden" 
             />
             <TooltipProvider>
