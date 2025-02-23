@@ -25,12 +25,16 @@ const SpeakingCoach = () => {
     script.async = true;
     script.type = "text/javascript";
     
-    // Configure widget to remove telephone icon with a more specific selector
+    // Create a style element for our CSS
     const style = document.createElement('style');
     style.textContent = `
       .convai-widget [data-testid="call-button"],
       .convai-widget .convai-call-button,
-      .convai-widget button[aria-label="Call"] {
+      .convai-widget button[aria-label="Call"],
+      .convai-widget div[role="button"][aria-label="Call"],
+      .convai-widget .phone-icon,
+      .convai-widget [class*="call"],
+      .convai-widget [class*="phone"] {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
@@ -38,6 +42,10 @@ const SpeakingCoach = () => {
         height: 0 !important;
         position: absolute !important;
         pointer-events: none !important;
+        clip: rect(0 0 0 0) !important;
+        margin: -1px !important;
+        padding: 0 !important;
+        border: 0 !important;
       }
     `;
     
@@ -45,9 +53,34 @@ const SpeakingCoach = () => {
     document.head.appendChild(style);
     document.body.appendChild(script);
 
+    // Create a MutationObserver to ensure our styles are applied even after dynamic updates
+    const observer = new MutationObserver((mutations) => {
+      const widget = document.querySelector('.convai-widget');
+      if (widget) {
+        const phoneElements = widget.querySelectorAll('[class*="call"], [class*="phone"], [aria-label="Call"]');
+        phoneElements.forEach(element => {
+          if (element instanceof HTMLElement) {
+            element.style.display = 'none';
+            element.style.visibility = 'hidden';
+            element.style.opacity = '0';
+            element.style.width = '0';
+            element.style.height = '0';
+            element.style.position = 'absolute';
+            element.style.pointerEvents = 'none';
+          }
+        });
+      }
+    });
+
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
     // Cleanup function
     return () => {
-      // Only remove elements if they still exist in the document
+      observer.disconnect();
       if (script && script.parentNode) {
         script.parentNode.removeChild(script);
       }
